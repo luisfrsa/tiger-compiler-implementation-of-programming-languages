@@ -1,0 +1,77 @@
+GCCTIGER_INSTALL_NAME := $(shell echo gcctiger|sed '$(program_transform_name)')
+GCCTIGER_TARGET_INSTALL_NAME := $(target_noncanonical)-$(shell echo gcctiger|sed '$(program_transform_name)')
+ 
+tiger: tiger1$(exeext)
+ 
+.PHONY: tiger
+ 
+# Driver
+ 
+GCCTIGER_OBJS = \
+   $(GCC_OBJS) \
+   tiger/tigerspec.o \
+   $(END)
+ 
+gcctiger$(exeext): $(GCCTIGER_OBJS) $(EXTRA_GCC_OBJS) libcommon-target.a $(LIBDEPS)
+	+$(LINKER) $(ALL_LINKERFLAGS) $(LDFLAGS) -o $@ \
+	  $(GCCTIGER_OBJS) $(EXTRA_GCC_OBJS) libcommon-target.a \
+	  $(EXTRA_GCC_LIBS) $(LIBS)
+ 
+# The compiler proper
+ 
+tiger_OBJS = \
+    tiger/tiger1.o \
+    tiger/tiger-token.o \
+    tiger/tiger-lexer.o \
+    $(END)
+ 
+tiger1$(exeext): attribs.o $(tiger_OBJS) $(BACKEND) $(LIBDEPS)
+	+$(LLINKER) $(ALL_LINKERFLAGS) $(LDFLAGS) -o $@ \
+	      attribs.o $(tiger_OBJS) $(BACKEND) $(LIBS) $(BACKENDLIBS)
+ 
+tiger.all.cross:
+ 
+tiger.start.encap: gcctiger$(exeext)
+tiger.rest.encap:
+ 
+tiger.install-common: installdirs
+	-rm -f $(DESTDIR)$(bindir)/$(GCCTIGER_INSTALL_NAME)$(exeext)
+	$(INSTALL_PROGRAM) gcctiger$(exeext) $(DESTDIR)$(bindir)/$(GCCTIGER_INSTALL_NAME)$(exeext)
+	rm -f $(DESTDIR)$(bindir)/$(GCCTIGER_TARGET_INSTALL_NAME)$(exeext); \
+	( cd $(DESTDIR)$(bindir) && \
+      $(LN) $(GCCTIGER_INSTALL_NAME)$(exeext) $(GCCTIGER_TARGET_INSTALL_NAME)$(exeext) ); \
+ 
+# Required goals, they still do nothing
+tiger.install-man:
+tiger.install-info:
+tiger.install-pdf:
+tiger.install-plugin:
+tiger.install-html:
+tiger.info:
+tiger.dvi:
+tiger.pdf:
+tiger.html:
+tiger.man:
+tiger.mostlyclean:
+tiger.clean:
+tiger.distclean:
+tiger.maintainer-clean:
+ 
+# make uninstall
+tiger.uninstall:
+	-rm -f gcctiger$(exeext) tiger1$(exeext)
+	-rm -f $(tiger_OBJS)
+ 
+# Used for handling bootstrap
+tiger.stage1: stage1-start
+	-mv tiger/*$(objext) stage1/tiger
+tiger.stage2: stage2-start
+	-mv tiger/*$(objext) stage2/tiger
+tiger.stage3: stage3-start
+	-mv tiger/*$(objext) stage3/tiger
+tiger.stage4: stage4-start
+	-mv tiger/*$(objext) stage4/tiger
+tiger.stageprofile: stageprofile-start
+	-mv tiger/*$(objext) stageprofile/tiger
+tiger.stagefeedback: stagefeedback-start
+	-mv tiger/*$(objext) stagefeedback/tiger
