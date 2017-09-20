@@ -95,63 +95,57 @@ Lexer::classify_keyword (const std::string &str)
       return keyword_keys[idx - keyword_index];
     }
 }
-
 TokenPtr
-Lexer::build_token ()
+Lexer::build_token()
 {
-  for (;;)
-    {
-      location_t loc = get_current_location ();
-      int current_char = peek_input ();
-      skip_input ();
+    for (;;) {
+        location_t loc = get_current_location();
+        int current_char = peek_input();
+        skip_input();
 
-      if (current_char == EOF)
-	{
-	  return Token::make (END_OF_FILE, loc);
-	}
+        if (current_char == EOF) {
+            return Token::make(END_OF_FILE, loc);
+        }
 
-      switch (current_char)
-	{
-	// **************
-	// * Whitespace *
-	// **************
-	case '\n':
-	  current_line++;
-	  current_column = 1;
-	  linemap_line_start (::line_table, current_line, max_column_hint);
-	  continue;
-	case ' ':
-	  current_column++;
-	  continue;
-	case '\t':
-	  // Width of a tab is not well defined, let's assume 8 for now
-	  current_column += 8;
-	  continue;
+        switch (current_char) {
+        // **************
+        // * Whitespace *
+        // **************
+        case '\n':
+            current_line++;
+            current_column = 1;
+            linemap_line_start(::line_table, current_line, max_column_hint);
+            continue;
+        case ' ':
+            current_column++;
+            continue;
+        case '\t':
+            // Width of a tab is not well defined, let's assume 8 for now
+            current_column += 8;
+            continue;
 
-	// ***************
-	// * Punctuation *
-	// ***************
-	case ':':
-	  if (peek_input () == '=')
-	    {
-	      skip_input ();
-	      current_column += 2;
+        // ***************
+        // * Punctuation *
+        // ***************
+        case ':':
+            if (peek_input() == '=') {
+                skip_input();
+                current_column += 2;
 
-	      return Token::make (ASSIG, loc);
-	    }
-	  else
-	    {
-	      current_column++;
-	      return Token::make (COLON, loc);
-	    }
-	  break;
-	case '*':
-	  current_column++;
-	  return Token::make (ASTERISK, loc);
-	// case ',':
-	//   current_column++;
-	//   return Token::make (COMMA, loc);
-	/*case '!':
+                return Token::make(ASSIG, loc);
+            }
+            else {
+                current_column++;
+                return Token::make(COLON, loc);
+            }
+            break;
+        case '*':
+            current_column++;
+            return Token::make(ASTERISK, loc);
+        // case ',':
+        //   current_column++;
+        //   return Token::make (COMMA, loc);
+        /*case '!':
 	  if (peek_input () == '=')
 	    {
 	      skip_input ();
@@ -160,67 +154,104 @@ Lexer::build_token ()
 	      return Token::make (DIFFERENT, loc);
 	    }
 	  break;*/
-	  case '<':
-	  if (peek_input () == '>')
-	    {
-	      skip_input ();
-	      current_column += 2;
-	      return Token::make (DIFFERENT, loc);
-	    }
-	  break;
-	case '=':
-	  current_column++;
-	  return Token::make (EQUAL, loc);
-	case '(':
-	  current_column++;
-	  return Token::make (LEFT_PAREN, loc);
-	case '-':
-	  current_column++;
-	  return Token::make (MINUS, loc);
-	case '+':
-	  current_column++;
-	  return Token::make (PLUS, loc);
-	case ')':
-	  current_column++;
-	  return Token::make (RIGHT_PAREN, loc);
-	case ';':
-	  current_column++;
-	  return Token::make (SEMICOLON, loc);
-	case '<':
-	  if (peek_input () == '=')
-	    {
-	      skip_input ();
-	      current_column += 2;
+            /*
+        case '<':
+            if (peek_input() == '>') {
+                skip_input();
+                current_column += 2;
+                return Token::make(DIFFERENT, loc);
+            }
+            break;
+            */
+        case '=':
+            current_column++;
+            return Token::make(EQUAL, loc);
+        case '(':
+            current_column++;
+            return Token::make(LEFT_PAREN, loc);
+        case '-':
+            current_column++;
+            return Token::make(MINUS, loc);
+        case '+':
+            current_column++;
+            return Token::make(PLUS, loc);
+        case ')':
+            current_column++;
+            return Token::make(RIGHT_PAREN, loc);
+        case ';':
+            current_column++;
+            return Token::make(SEMICOLON, loc);
+        case '<':
+            current_char = peek_input();
+            switch (current_char){
+            	case '=':
+	            	skip_input();
+	                current_column += 2;
+	                return Token::make(LOWER_OR_EQUAL, loc);
+            	case '>':
+            		skip_input();
+	                current_column += 2;
+	                return Token::make(DIFFERENT, loc);
+	            default:
+	             	current_column++;
+                	return Token::make(LOWER, loc);
 
-	      return Token::make (LOWER_OR_EQUAL, loc);
-	    }
-	  else
-	    {
-	      current_column++;
-	      return Token::make (LOWER, loc);
-	    }
-	  break;
-	case '>':
-	  if (peek_input () == '=')
-	    {
-	      skip_input ();
-	      current_column += 2;
+            }       
+                 
+        case '>':
+            if (peek_input() == '=') {
+                skip_input();
+                current_column += 2;
 
-	      return Token::make (GREATER_OR_EQUAL, loc);
-	    }
-	  else
-	    {
-	      current_column++;
-	      return Token::make (GREATER, loc);
-	    }
-	  break;
-	case '/':
-	  current_column++;
-	  return Token::make (SLASH, loc);
-	case '%':
-	  current_column++;
-	  return Token::make (PERCENT, loc);
-	case '#': /* comment */
+                return Token::make(GREATER_OR_EQUAL, loc);
+            }
+            else {
+                current_column++;
+                return Token::make(GREATER, loc);
+            }
+            break;
+          
+        case '/':
+            current_column ++;
+            if (peek_input() == '*') {
+            	current_column ++;
+                current_char = peek_input();
+                int fim_comentario = 0;
+            	while (current_char!= EOF || fim_comentario==0) {
+                	skip_input();
+                	current_char = peek_input();
+                	switch(current_char){
+                		case '\n':
+				            current_line++;
+				            current_column = 1;
+				            linemap_line_start(::line_table, current_line, max_column_hint);
+				            break;
+				        case '\t':
+				            current_column += 8;
+				            break;
+				        case '*':
+				            current_column++;
+				        	if (peek_input() == '/') {
+				            	current_column++;
+				            	fim_comentario = 1;
+				        	}
+				        break;
+				        default:
+				            current_column++;
+				        break;
+                	}
+                }
+                continue;            
+
+            }else {
+                current_column++;
+                return Token::make(SLASH, loc);
+            }
+        case '%':
+            current_column++;
+            return Token::make(PERCENT, loc);
+        /*
+	case '#':  comment 
 	  current_column++;
 	  current_char = peek_input ();
 	  while (current_char != '\n')
@@ -231,131 +262,124 @@ Lexer::build_token ()
 	    }
 	  continue;
 	  break;
-	case '[':
-	  current_column++;
-	  return Token::make (LEFT_SQUARE, loc);
-	case ']':
-	  current_column++;
-	  return Token::make (RIGHT_SQUARE, loc);
+	  */
+        case '{':
+            current_column++;
+            return Token::make(LEFT_BRACE, loc);
+        case '}':
+            current_column++;
+            return Token::make(RIGHT_BRACE, loc);
+        case '[':
+            current_column++;
+            return Token::make(LEFT_SQUARE, loc);
+        case ']':
+            current_column++;
+            return Token::make(RIGHT_SQUARE, loc);
         case '.':
-	  if (!ISDIGIT(peek_input ()))
-	    {
-	      // Only if followed by a non number
-	      current_column++;
-	      return Token::make (DOT, loc);
-	    }
-	}
-o do esta como  keyword, sendo necessario subsituir por { e ver como o end se comporta
-      // ***************************
-      // * Identifiers or keywords *
-      // ***************************
-      if (ISALPHA (current_char) || current_char == '_')
-	{
-	  std::string str;
-	  str.reserve (16); // some sensible default
-	  str += current_char;
+            if (!ISDIGIT(peek_input())) {
+                // Only if followed by a non number
+                current_column++;
+                return Token::make(DOT, loc);
+            }
+        }
+        /*o do esta como  keyword, sendo necessario subsituir por { e ver como o end se comporta*/
+        // ***************************
+        // * Identifiers or keywords *
+        // ***************************
+        if (ISALPHA(current_char) || current_char == '_') {
+            std::string str;
+            str.reserve(16); // some sensible default
+            str += current_char;
 
-	  int length = 1;
-	  current_char = peek_input ();
-	  while (ISALPHA (current_char) || ISDIGIT (current_char)
-		 || current_char == '_')
-	    {
-	      length++;
+            int length = 1;
+            current_char = peek_input();
+            while (ISALPHA(current_char) || ISDIGIT(current_char)
+                || current_char == '_') {
+                length++;
 
-	      str += current_char;
-	      skip_input ();
-	      current_char = peek_input ();
-	    }
+                str += current_char;
+                skip_input();
+                current_char = peek_input();
+            }
 
-	  current_column += length;
+            current_column += length;
 
-	  TokenId keyword = classify_keyword (str);
-	  if (keyword == IDENTIFIER)
-	    {
-	      return Token::make_identifier (loc, str);
-	    }
-	  else
-	    {
-	      return Token::make (keyword, loc);
-	    }
-	}
+            TokenId keyword = classify_keyword(str);
+            if (keyword == IDENTIFIER) {
+                return Token::make_identifier(loc, str);
+            }
+            else {
+                return Token::make(keyword, loc);
+            }
+        }
 
-      // ****************************
-      // * Integer or real literals *
-      // ****************************
-      if (ISDIGIT (current_char) || current_char == '.')
-	{
-	  std::string str;
-	  str.reserve (16); // some sensible default
-	  str += current_char;
+        // ****************************
+        // * Integer or real literals *
+        // ****************************
+        if (ISDIGIT(current_char) || current_char == '.') {
+            std::string str;
+            str.reserve(16); // some sensible default
+            str += current_char;
 
-	  bool is_real = (current_char == '.');
+            bool is_real = (current_char == '.');
 
-	  int length = 1;
-	  current_char = peek_input ();
-	  while (ISDIGIT (current_char) || (!is_real && current_char == '.'))
-	    {
-	      length++;
+            int length = 1;
+            current_char = peek_input();
+            while (ISDIGIT(current_char) || (!is_real && current_char == '.')) {
+                length++;
 
-	      is_real = is_real || (current_char == '.');
+                is_real = is_real || (current_char == '.');
 
-	      str += current_char;
-	      skip_input ();
-	      current_char = peek_input ();
-	    }
+                str += current_char;
+                skip_input();
+                current_char = peek_input();
+            }
 
-	  current_column += length;
+            current_column += length;
 
-	  if (is_real)
-	    {
-	      return Token::make_real (loc, str);
-	    }
-	  else
-	    {
-	      return Token::make_integer (loc, str);
-	    }
-	}
+            if (is_real) {
+                return Token::make_real(loc, str);
+            }
+            else {
+                return Token::make_integer(loc, str);
+            }
+        }
 
-      // *******************
-      // * String literals *
-      // *******************
-      if (current_char == '"')
-	{
-	  std::string str;
-	  str.reserve (16); // some sensible default
+        // *******************
+        // * String literals *
+        // *******************
+        if (current_char == '"') {
+            std::string str;
+            str.reserve(16); // some sensible default
 
-	  int length = 1;
-	  current_char = peek_input ();
-	  while (current_char != '\n' && current_char != '"')
-	    {
-	      length++;
+            int length = 1;
+            current_char = peek_input();
+            while (current_char != '\n' && current_char != '"') {
+                length++;
 
-	      str += current_char;
-	      skip_input ();
-	      current_char = peek_input ();
-	    }
+                str += current_char;
+                skip_input();
+                current_char = peek_input();
+            }
 
-	  current_column += length;
+            current_column += length;
 
-	  if (current_char == '\n')
-	    {
-	      error_at (get_current_location (), "unended string literal");
-	    }
-	  else if (current_char == '"')
-	    {
-	      skip_input ();
-	    }
-	  else
-	    {
-	      gcc_unreachable ();
-	    }
+            if (current_char == '\n') {
+                error_at(get_current_location(), "unended string literal");
+            }
+            else if (current_char == '"') {
+                skip_input();
+            }
+            else {
+                gcc_unreachable();
+            }
 
-	  return Token::make_string (loc, str);
-	}
+            return Token::make_string(loc, str);
+        }
 
-      // Martians
-      error_at (loc, "unexpected character '%x'", current_char);
-      current_column++;
+        // Martians
+        error_at(loc, "unexpected character '%x'", current_char);
+        current_column++;
     }
 }
 
