@@ -98,6 +98,7 @@ Lexer::classify_keyword (const std::string &str)
 TokenPtr
 Lexer::build_token()
 {
+    int fim_comentario;
     for (;;) {
         location_t loc = get_current_location();
         int current_char = peek_input();
@@ -210,46 +211,55 @@ Lexer::build_token()
                 return Token::make(GREATER, loc);
             }
             break;
-          
         case '/':
-            current_column ++;
             if (peek_input() == '*') {
-            	current_column ++;
-                current_char = peek_input();
-                int fim_comentario = 0;
-            	while (current_char!= EOF || fim_comentario==0) {
-                	skip_input();
-                	current_char = peek_input();
-                	switch(current_char){
-                		case '\n':
-				            current_line++;
-				            current_column = 1;
-				            linemap_line_start(::line_table, current_line, max_column_hint);
-				            break;
-				        case '\t':
-				            current_column += 8;
-				            break;
-				        case '*':
-				            current_column++;
-				        	if (peek_input() == '/') {
-				            	current_column++;
-				            	fim_comentario = 1;
-				        	}
-				        break;
-				        default:
-				            current_column++;
-				        break;
-                	}
+              current_column++;
+              skip_input();
+              fim_comentario = 0;
+              while (fim_comentario==0){
+                current_char = peek_input ();
+                skip_input ();
+                switch(current_char){
+                    case '\n':
+                        current_column=1;
+                        current_line++;
+                        linemap_line_start(::line_table, current_line, max_column_hint);
+                        break;
+                    case '\t':
+                        current_column+=8;
+                        break;
+                    case EOF:
+                        fim_comentario = 1;//nao usado
+                        return Token::make(END_OF_FILE, loc);
+                        break;
+                    case '*':
+                        current_column++;
+                        if (peek_input() == '/') {
+                            skip_input ();
+                            current_column++;
+                            fim_comentario = 1;
+                        }
+                        break;
+                    default:
+                        current_column++;
+                        break;
                 }
-                continue;            
-
+              }
+              continue;
             }else {
                 current_column++;
                 return Token::make(SLASH, loc);
             }
+            break;
         case '%':
             current_column++;
             return Token::make(PERCENT, loc);
+        case '&':
+            current_column++;
+            return Token::make(AND, loc);
+        case '|':
+            current_column++;
+            return Token::make(OR, loc);
         /*
 	case '#':  comment 
 	  current_column++;
@@ -282,9 +292,9 @@ Lexer::build_token()
                 return Token::make(DOT, loc);
             }
         }
-        /*o do esta como  keyword, sendo necessario subsituir por { e ver como o end se comporta*/
+
         // ***************************
-        // * Identifiers or keywords *
+        // * Identifiers or  keywords *
         // ***************************
         if (ISALPHA(current_char) || current_char == '_') {
             std::string str;
@@ -293,8 +303,7 @@ Lexer::build_token()
 
             int length = 1;
             current_char = peek_input();
-            while (ISALPHA(current_char) || ISDIGIT(current_char)
-                || current_char == '_') {
+            while (ISALPHA(current_char) || ISDIGIT(current_char) || current_char == '_') {
                 length++;
 
                 str += current_char;
@@ -336,7 +345,10 @@ Lexer::build_token()
             }
 
             current_column += length;
-
+            
+            if(ISALPHA(current_char)){/* || current_char == '_') {*/
+                error_at(get_current_location(), "String iniciado com numeral");
+            }
             if (is_real) {
                 return Token::make_real(loc, str);
             }
@@ -369,8 +381,7 @@ Lexer::build_token()
             }
             else if (current_char == '"') {
                 skip_input();
-            }
-            else {
+            }else {
                 gcc_unreachable();
             }
 

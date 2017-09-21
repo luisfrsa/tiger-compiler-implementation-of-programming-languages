@@ -1,0 +1,12 @@
+./contrib/download_prerequisites
+
+../gcc-src/configure --prefix=$(pwd)/../gcc-install --disable-bootstrap --enable-languages=c,c++,tiger --disable-multilib
+../gcc-src/configure --prefix=$(pwd)/../gcc-install --disable-bootstrap --enable-languages=c,c++,tiger,tiny --disable-multilib
+
+make -j$(getconf _NPROCESSORS_ONLN)
+
+make install
+
+
+./gcc-install/bin/gcctiger -c ./gcc-src/gcc/tiger/my_folder/tests/
+./gcc-install/bin/gcctiger -c ./gcc-src/gcc/tiger/my_folder/tests/queens.tiger 

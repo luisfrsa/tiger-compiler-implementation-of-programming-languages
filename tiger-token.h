@@ -16,7 +16,9 @@ namespace Tiger
 // TIGER_TOKEN_KEYWORD(name, identifier)
 //
 // Keep TIGER_TOKEN_KEYWORD sorted
-
+//REMOVER: true? false?, read, record??
+  //virgula nao esta no lexer
+  //adicionado string
 #define TIGER_TOKEN_LIST                                                        \
   TIGER_TOKEN (FIRST_TOKEN, "<first-token-marker>")                             \
   TIGER_TOKEN (END_OF_FILE, "end of file")                                      \
@@ -49,7 +51,7 @@ namespace Tiger
   TIGER_TOKEN (OPEN_COMMENT, "/*")                                              \
   TIGER_TOKEN (CLOSE_COMMENT, "*/")                                             \
                                                                                 \
-  TIGER_TOKEN_KEYWORD (AND, "and")                                              \
+  TIGER_TOKEN_KEYWORD (AND, "&")                                                \
   TIGER_TOKEN_KEYWORD (BOOL, "bool")                                            \
   TIGER_TOKEN_KEYWORD (DO, "do")                                                \
   TIGER_TOKEN_KEYWORD (ELSE, "else")                                            \
@@ -59,8 +61,9 @@ namespace Tiger
   TIGER_TOKEN_KEYWORD (FOR, "for")                                              \
   TIGER_TOKEN_KEYWORD (IF, "if")                                                \
   TIGER_TOKEN_KEYWORD (INT, "int")                                              \
+  TIGER_TOKEN_KEYWORD (STRING, "string")                                        \
   TIGER_TOKEN_KEYWORD (NOT, "not")                                              \
-  TIGER_TOKEN_KEYWORD (OR, "or")                                                \
+  TIGER_TOKEN_KEYWORD (OR, "|")                                                \
   TIGER_TOKEN_KEYWORD (READ, "read")                                            \
   TIGER_TOKEN_KEYWORD (RECORD, "record")                                        \
   TIGER_TOKEN_KEYWORD (THEN, "then")                                            \
@@ -70,7 +73,6 @@ namespace Tiger
   TIGER_TOKEN_KEYWORD (VAR, "var")                                              \
   TIGER_TOKEN_KEYWORD (WHILE, "while")                                          \
   TIGER_TOKEN_KEYWORD (WRITE, "write")                                          \
-  TIGER_TOKEN_KEYWORD (FUNC_RET, "->")                                          \
   TIGER_TOKEN_KEYWORD (ARRAY, "array")                                          \
   TIGER_TOKEN_KEYWORD (FUNCTION, "function")                                    \
   TIGER_TOKEN_KEYWORD (IN, "in")                                                \
