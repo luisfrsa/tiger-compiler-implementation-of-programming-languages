@@ -98,7 +98,6 @@ Lexer::classify_keyword (const std::string &str)
 TokenPtr
 Lexer::build_token()
 {
-    int fim_comentario;
     for (;;) {
         location_t loc = get_current_location();
         int current_char = peek_input();
@@ -212,10 +211,11 @@ Lexer::build_token()
             }
             break;
         case '/':
-            if (peek_input() == '*') {
+            if (peek_input() == '*') {                
+              int count_comment=1;
+              int fim_comentario = 0;
               current_column++;
               skip_input();
-              fim_comentario = 0;
               while (fim_comentario==0){
                 current_char = peek_input ();
                 skip_input ();
@@ -232,12 +232,23 @@ Lexer::build_token()
                         fim_comentario = 1;//nao usado
                         return Token::make(END_OF_FILE, loc);
                         break;
+                    case '/':
+                        current_column++;
+                        if (peek_input() == '*') {
+                            skip_input ();
+                            current_column++;
+                            count_comment++;
+                        }
+                        break;    
                     case '*':
                         current_column++;
                         if (peek_input() == '/') {
                             skip_input ();
                             current_column++;
-                            fim_comentario = 1;
+                            count_comment--;
+                            if(count_comment==0){
+                                fim_comentario = 1;
+                            }
                         }
                         break;
                     default:
@@ -260,12 +271,11 @@ Lexer::build_token()
         case '|':
             current_column++;
             return Token::make(OR, loc);
-        /*
-	case '#':  comment 
-	  current_column++;
-	  current_char = peek_input ();
-	  while (current_char != '\n')
-	    {
+/*case '#':  comment 
+current_column++;
+current_char = peek_input ();
+while (current_char != '\n')
+{
 	      skip_input ();
 	      current_column++; // won't be used
 	      current_char = peek_input ();
@@ -345,10 +355,10 @@ Lexer::build_token()
             }
 
             current_column += length;
-            
-            if(ISALPHA(current_char)){/* || current_char == '_') {*/
+            /*erro sintatico e não lexico
+            if(ISALPHA(current_char)){/* || current_char == '_') {
                 error_at(get_current_location(), "String iniciado com numeral");
-            }
+            }*/
             if (is_real) {
                 return Token::make_real(loc, str);
             }

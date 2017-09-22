@@ -8,5 +8,5 @@ make -j$(getconf _NPROCESSORS_ONLN)
 make install
 
 
-./gcc-install/bin/gcctiger -c ./gcc-src/gcc/tiger/my_folder/tests/
-./gcc-install/bin/gcctiger -c ./gcc-src/gcc/tiger/my_folder/tests/queens.tiger 
+../gcc-install/bin/gcctiger -c ../gcc-src/gcc/tiger/my_folder/tests/
+../gcc-install/bin/gcctiger -c ../gcc-src/gcc/tiger/my_folder/tests/queens.tiger 
