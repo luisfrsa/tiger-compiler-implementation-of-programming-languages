@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include <algorithm>
 
-namespace Tiger
+namespace Tiger 
 {
 
 Lexer::Lexer (const char *filename, FILE *input_)
