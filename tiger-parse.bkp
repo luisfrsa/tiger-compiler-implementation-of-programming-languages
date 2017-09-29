@@ -1,16 +1,29 @@
-  
+/* Tiger parser
+   Copyright (C) 2016 Free Software Foundation, Inc.
+
+GNU CC is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+GNU CC is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GCC; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.  */
+
 #include <iostream>
 #include <memory>
 
 #include "tiger/tiger-parser.h"
 #include "tiger/tiger-lexer.h"
-/*
-#include "tiger/tiger-tree.h"
+/*#include "tiger/tiger-tree.h"
 #include "tiger/tiger-symbol.h"
 #include "tiger/tiger-symbol-mapping.h"
-#include "tiger/tiger-scope.h"
-*/
-
+#include "tiger/tiger-scope.h"*/
 #include "config.h"
 #include "system.h"
 #include "coretypes.h"
@@ -28,73 +41,34 @@
 #include "stor-layout.h"
 #include "fold-const.h"
 
-namespace
-{
-  enum binding_powers
-  {
-    // Highest priority
-    LBP_HIGHEST = 100,
-   
-    LBP_UNARY_PLUS = 50,  // Used only when the null denotation is +
-    LBP_UNARY_MINUS = LBP_UNARY_PLUS, // Used only when the null denotation is -
-   
-    LBP_MUL = 40,
-    LBP_DIV = LBP_MUL,
-    LBP_MOD = LBP_MUL,
-   
-    LBP_PLUS = 30,
-    LBP_MINUS = LBP_PLUS,
-   
-    LBP_EQUAL = 20,
-    LBP_DIFFERENT = LBP_EQUAL,
-    LBP_LOWER_THAN = LBP_EQUAL,
-    LBP_LOWER_EQUAL = LBP_EQUAL,
-    LBP_GREATER_THAN = LBP_EQUAL,
-    LBP_GREATER_EQUAL = LBP_EQUAL,
-   
-    LBP_LOGICAL_AND = 10,
-    LBP_LOGICAL_OR = LBP_LOGICAL_AND,
-    LBP_LOGICAL_NOT = LBP_LOGICAL_AND,
-   
-    // Lowest priority
-    LBP_LOWEST = 0,
-  };
-   }
-
 namespace Tiger{
 
   struct Parser{
-    // ...
+    private:
+      void skip_after_semicolon ();
+      void skip_after_end ();
+
+      bool skip_token (TokenId);
+      const_TokenPtr expect_token (TokenId);
+      void unexpected_token (const_TokenPtr);
+
+      // Expression parsing
+      int left_binding_power (const_TokenPtr tok);
+
+      void enter_scope ();
+      void parse_statement_seq (bool (Parser::*done) ());
+
+      bool done_end ();
+      bool done_end_or_else ();
+      bool done_end_of_file ();
     public:
-    Parser (Lexer & lexer_): lexer (lexer_) { }
+    Parser (Lexer &lexer_) : lexer (lexer_) { }
     void parse_program();
-    void parse_statement_seq(bool(Parser:: * done)());
-    bool done_end_or_else ();
-    bool done_end_of_file ();
-    void parse_statement ();
-    void parse_variable_declaration ();
-    void parse_while_statement();
-    void parse_for_statement();
-    void parse_read_statement();
-    void parse_write_statement();
-    void parse_assignment_statement();
-    void unexpected_token(const_TokenPtr t);
-    void skip_after_semicolon();
-    bool done_end();
-    void skip_after_end();
-    bool skip_token(Tiger::TokenId token_id);
-    void parse_if_statement();
-    const_TokenPtr expect_token(Tiger::TokenId token_id);
-    bool parse_type();
-    bool parse_expression(int right_binding_power);
-    bool parse_expression();
-    bool null_denotation(const_TokenPtr tok);
-    int left_binding_power (const_TokenPtr token);
-    bool left_denotation (const_TokenPtr tok);
-
-    typedef bool (Parser::*BinaryHandler) (const_TokenPtr);
-    BinaryHandler get_binary_handler (TokenId id);
-
+    private:
+      Lexer &lexer;
+      typedef bool (Parser::*BinaryHandler) (const_TokenPtr);
+      BinaryHandler get_binary_handler (TokenId id);
+     
     #define BINARY_HANDLER_LIST                                                    \
       BINARY_HANDLER (plus, PLUS)                                                  \
       BINARY_HANDLER (minus, MINUS)                                                \
@@ -110,25 +84,28 @@ namespace Tiger{
       BINARY_HANDLER (greater_equal, GREATER_OR_EQUAL)                             \
                                                                                    \
       BINARY_HANDLER (logical_and, AND)                                            \
-      BINARY_HANDLER (logical_or, OR)                                              \
-                                                                                   \
-      BINARY_HANDLER (array_ref, LEFT_SQUARE)                                      \
-                                                                                   \
-      BINARY_HANDLER (field_ref, DOT)
-
+      BINARY_HANDLER (logical_or, OR)
+     
     #define BINARY_HANDLER(name, _)                                                \
       bool binary_##name (const_TokenPtr tok);
       BINARY_HANDLER_LIST
     #undef BINARY_HANDLER
-    private:
-      Lexer &lexer;
-
-   };
+      // ...
+    };
+  };
+  bool
+  Parser::done_end_of_file ()
+  {
+    const_TokenPtr t = lexer.peek_token ();
+    return (t->get_id () == Tiger::END_OF_FILE);
+  }
+   
   void
   Parser::parse_program ()
   {
-     parse_statement_seq(&Parser::done_end_of_file);
+    parse_statement_seq (&Parser::done_end_of_file);
   }
+  
   void
   Parser::parse_statement_seq (bool (Parser::*done) ())
   {
@@ -137,25 +114,6 @@ namespace Tiger{
       {
         parse_statement ();
       }
-  }
-  bool
-  Parser::done_end_of_file ()
-  {
-    const_TokenPtr t = lexer.peek_token ();
-    return (t->get_id () == Tiger::END_OF_FILE);
-  }
-   bool
-  Parser::done_end_or_else ()
-  {
-    const_TokenPtr t = lexer.peek_token ();
-    return (t->get_id () == Tiger::END || t->get_id () == Tiger::ELSE
-      || t->get_id () == Tiger::END_OF_FILE);
-  }
-  bool
-  Parser::done_end ()
-  {
-    const_TokenPtr t = lexer.peek_token ();
-    return (t->get_id () == Tiger::END || t->get_id () == Tiger::END_OF_FILE);
   }
   void
   Parser::parse_statement ()
@@ -169,10 +127,9 @@ namespace Tiger{
       case Tiger::IF:
         parse_if_statement ();
         break;
-      /*case Tiger::WHILE:
+      case Tiger::WHILE:
         parse_while_statement ();
         break;
-       
       case Tiger::FOR:
         parse_for_statement ();
         break;
@@ -185,7 +142,6 @@ namespace Tiger{
       case Tiger::IDENTIFIER:
         parse_assignment_statement ();
         break;
-        */
       default:
         unexpected_token (t);
         skip_after_semicolon ();
@@ -214,15 +170,6 @@ namespace Tiger{
   }
   void
   Parser::parse_variable_declaration ()
-  /*
-  Tiny:
-  var a:int;
-  Tiger:
-  var a := 1;
-  var a :int;
-  var a :int :=1;
-  var a :int :=nil;
-  */
   {
     if (!skip_token (Tiger::VAR))
       {
@@ -249,35 +196,6 @@ namespace Tiger{
     skip_token (Tiger::SEMICOLON);
   }
   bool
-  Parser::parse_type ()
-  {
-    const_TokenPtr t = lexer.peek_token ();
-   
-    switch (t->get_id ())
-      {
-      case Tiger::INT:
-        lexer.skip_token ();
-        return true;
-      case Tiger::REAL:
-        lexer.skip_token ();
-        return true;
-      default:
-        unexpected_token (t);
-        return false;
-      }
-  }
-
-  /*
-  Here we use a function skip_token that given a token id, 
-  checks if the current token has that same id. If it has, 
-  it just skips it and returns true. Otherwise diagnoses an 
-  error and returns false. When skip_token fails (i.e. returns false)
-  we immediately go to panic mode and give up parsing the current statement.
-  As you can see this code quickly becomes tedious and repetitive.
-  No wonder there exist tools, like ANTLR by Terence Parr, 
-  that automate the code generation of recursive descent recognizers.
-  */
-  bool
   Parser::skip_token (Tiger::TokenId token_id)
   {
     return expect_token (token_id) != const_TokenPtr ();
@@ -298,7 +216,24 @@ namespace Tiger{
         return const_TokenPtr ();
       }
   }
-  
+  bool
+  Parser::parse_type ()
+  {
+    const_TokenPtr t = lexer.peek_token ();
+   
+    switch (t->get_id ())
+      {
+      case Tiger::INT:
+        lexer.skip_token ();
+        return true;
+      case Tiger::FLOAT:
+        lexer.skip_token ();
+        return true;
+      default:
+        unexpected_token (t);
+        return false;
+      }
+  }
   void
   Parser::parse_if_statement ()
   {
@@ -374,7 +309,7 @@ namespace Tiger{
   bool
   Parser::parse_expression ()
   {
-    return parse_expression(/*LBP_LOWEST*/0);
+    return parse_expression(LBP_LOWEST);
   }
   bool
   Parser::null_denotation (const_TokenPtr tok)
@@ -402,7 +337,7 @@ namespace Tiger{
       case Tiger::MINUS:
         {
     if (!parse_expression (LBP_UNARY_MINUS))
-             return false;
+             return false
           return true;
         }
       case Tiger::NOT:
@@ -433,7 +368,6 @@ namespace Tiger{
   {
     switch (id)
       {
-        /*
   #define BINARY_HANDLER(name, token_id)                                         \
     case Tiger::token_id:                                                         \
       return &Parser::binary_##name;
@@ -441,7 +375,6 @@ namespace Tiger{
   #undef BINARY_HANDLER
       default:
         return NULL;
-      */
       }
   }
   bool
@@ -451,7 +384,36 @@ namespace Tiger{
        return false;
     return true;
   }
-  
+  enum binding_powers
+  {
+    // Highest priority
+    LBP_HIGHEST = 100,
+   
+    LBP_UNARY_PLUS = 50,  // Used only when the null denotation is +
+    LBP_UNARY_MINUS = LBP_UNARY_PLUS, // Used only when the null denotation is -
+   
+    LBP_MUL = 40,
+    LBP_DIV = LBP_MUL,
+    LBP_MOD = LBP_MUL,
+   
+    LBP_PLUS = 30,
+    LBP_MINUS = LBP_PLUS,
+   
+    LBP_EQUAL = 20,
+    LBP_DIFFERENT = LBP_EQUAL,
+    LBP_LOWER_THAN = LBP_EQUAL,
+    LBP_LOWER_EQUAL = LBP_EQUAL,
+    LBP_GREATER_THAN = LBP_EQUAL,
+    LBP_GREATER_EQUAL = LBP_EQUAL,
+   
+    LBP_LOGICAL_AND = 10,
+    LBP_LOGICAL_OR = LBP_LOGICAL_AND,
+    LBP_LOGICAL_NOT = LBP_LOGICAL_AND,
+   
+    // Lowest priority
+    LBP_LOWEST = 0,
+  };
+   
    
   int
   Parser::left_binding_power (const_TokenPtr token)
@@ -496,11 +458,13 @@ namespace Tiger{
         return LBP_LOWEST;
       }
   }
-  
 }
-// ------------------------------------------------------
-// ------------------------------------------------------
-// ------------------------------------------------------
+
+
+
+
+
+
 
 /*---------------------------------------------*/
 /*---------------------------------------------*/
@@ -534,7 +498,6 @@ tiger_parse_file (const char *filename)
   Tiger::const_TokenPtr tok = lex.peek_token ();
   for (;;)
     {
-      break;
       bool has_text = tok->get_id () == Tiger::IDENTIFIER
           || tok->get_id () == Tiger::INTEGER_LITERAL
           || tok->get_id () == Tiger::REAL_LITERAL
@@ -554,8 +517,7 @@ tiger_parse_file (const char *filename)
     }
   Tiger::Parser parser (lex);
 
-  parser.parse_program ();
-
+ 
   fclose (file);
 }
 /*comentado no tiger-parser.cc e adicionado aqui */

@@ -21,6 +21,7 @@ gcctiger$(exeext): $(GCCTIGER_OBJS) $(EXTRA_GCC_OBJS) libcommon-target.a $(LIBDE
  
 tiger_OBJS = \
     tiger/tiger1.o \
+    tiger/tiger-parser.o \
     tiger/tiger-token.o \
     tiger/tiger-lexer.o \
     $(END)

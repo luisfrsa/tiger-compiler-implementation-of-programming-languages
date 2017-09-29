@@ -95,54 +95,7 @@ tiger_langhook_parse_file (void)
   tiger_parse_files (num_in_fnames, in_fnames);
 }
 
-/*comentado no tiger-parser.cc e adicionado aqui */
-static void tiger_parse_file (const char *filename);
-
-void
-tiger_parse_files (int num_files, const char **files)
-{
-  for (int i = 0; i < num_files; i++)
-    {
-      tiger_parse_file (files[i]);
-    }
-}
-
-static void
-tiger_parse_file (const char *filename)
-{
-  FILE *file = fopen (filename, "r");
-  if (file == NULL)
-    {
-      fatal_error (UNKNOWN_LOCATION, "cannot open filename %s: %m", filename);
-    }
- 
-  // Here we would parse our file
-  Tiger::Lexer lex (filename, file);
- 
-  Tiger::const_TokenPtr tok = lex.peek_token ();
-  for (;;)
-    {
-      bool has_text = tok->get_id () == Tiger::IDENTIFIER
-          || tok->get_id () == Tiger::INTEGER_LITERAL
-          || tok->get_id () == Tiger::REAL_LITERAL
-          || tok->get_id () == Tiger::STRING_LITERAL;
- 
-      location_t loc = tok->get_locus ();
- 
-      fprintf (stderr, "<id=%s%s, %s, line=%d, col=%d>\n", tok->token_id_to_str (),
-         has_text ? (std::string(", text=") + tok->get_str ()).c_str () : "",
-         LOCATION_FILE (loc), LOCATION_LINE (loc), LOCATION_COLUMN (loc));
- 
-      if (tok->get_id() == Tiger::END_OF_FILE)
-          break;
- 
-      lex.skip_token ();
-      tok = lex.peek_token ();
-    }
- 
-  fclose (file);
-}
-/*comentado no tiger-parser.cc e adicionado aqui */
+/*aqui estava carregando o arquivo tiger_parse_file*/
 
 
 

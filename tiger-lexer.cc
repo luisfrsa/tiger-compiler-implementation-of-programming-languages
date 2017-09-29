@@ -9,90 +9,88 @@
 #include <cstdlib>
 #include <algorithm>
 
-namespace Tiger 
-{
+namespace Tiger {
 
-Lexer::Lexer (const char *filename, FILE *input_)
-  : input (input_), current_line (1), current_column (1), line_map (0),
-    input_source (input), input_queue (input_source), token_source (this),
-    token_queue (token_source)
+Lexer::Lexer(const char* filename, FILE* input_)
+    : input(input_)
+    , current_line(1)
+    , current_column(1)
+    , line_map(0)
+    , input_source(input)
+    , input_queue(input_source)
+    , token_source(this)
+    , token_queue(token_source)
 {
-  line_map = ::linemap_add (::line_table, ::LC_ENTER,
-			    /* sysp */ 0, filename,
-			    /* current_line */ 1);
+    line_map = ::linemap_add(::line_table, ::LC_ENTER,
+        /* sysp */ 0, filename,
+        /* current_line */ 1);
 }
 
-Lexer::~Lexer ()
+Lexer::~Lexer()
 {
-  ::linemap_add (::line_table, ::LC_LEAVE,
-		 /* sysp */ 0,
-		 /* filename */ NULL,
-		 /* to_line */ 0);
+    ::linemap_add(::line_table, ::LC_LEAVE,
+        /* sysp */ 0,
+        /* filename */ NULL,
+        /* to_line */ 0);
 }
 
 location_t
-Lexer::get_current_location ()
+Lexer::get_current_location()
 {
-  return ::linemap_position_for_column (::line_table, current_column);
+    return ::linemap_position_for_column(::line_table, current_column);
 }
 
-int
-Lexer::peek_input (int n)
+int Lexer::peek_input(int n)
 {
-  return input_queue.peek (n);
+    return input_queue.peek(n);
 }
 
-int
-Lexer::peek_input ()
+int Lexer::peek_input()
 {
-  return peek_input (0);
+    return peek_input(0);
 }
 
-void
-Lexer::skip_input (int n)
+void Lexer::skip_input(int n)
 {
-  input_queue.skip (n);
+    input_queue.skip(n);
 }
 
-void
-Lexer::skip_input ()
+void Lexer::skip_input()
 {
-  skip_input (0);
+    skip_input(0);
 }
 
-namespace
-{
+namespace {
 
-const std::string keyword_index[] = {
+    const std::string keyword_index[] = {
 #define TIGER_TOKEN(x, y)
 #define TIGER_TOKEN_KEYWORD(name, keyword) keyword,
-  TIGER_TOKEN_LIST
+        TIGER_TOKEN_LIST
 #undef TIGER_TOKEN_KEYWORD
 #undef TIGER_TOKEN
-};
+    };
 
-TokenId keyword_keys[] = {
+    TokenId keyword_keys[] = {
 #define TIGER_TOKEN(x, y)
 #define TIGER_TOKEN_KEYWORD(name, keyword) name,
-  TIGER_TOKEN_LIST
+        TIGER_TOKEN_LIST
 #undef TIGER_TOKEN_KEYWORD
 #undef TIGER_TOKEN
-};
+    };
 
-const int num_keywords = sizeof (keyword_index) / sizeof (*keyword_index);
+    const int num_keywords = sizeof(keyword_index) / sizeof(*keyword_index);
 }
 
 TokenId
-Lexer::classify_keyword (const std::string &str)
+Lexer::classify_keyword(const std::string& str)
 {
-  const std::string *last = keyword_index + num_keywords;
-  const std::string *idx = std::lower_bound (keyword_index, last, str);
+    const std::string* last = keyword_index + num_keywords;
+    const std::string* idx = std::lower_bound(keyword_index, last, str);
 
-  if (idx == last || str != *idx)
-    return IDENTIFIER;
-  else
-    {
-      return keyword_keys[idx - keyword_index];
+    if (idx == last || str != *idx)
+        return IDENTIFIER;
+    else {
+        return keyword_keys[idx - keyword_index];
     }
 }
 TokenPtr
@@ -146,15 +144,15 @@ Lexer::build_token()
         //   current_column++;
         //   return Token::make (COMMA, loc);
         /*case '!':
-	  if (peek_input () == '=')
-	    {
-	      skip_input ();
-	      current_column += 2;
+      if (peek_input () == '=')
+        {
+          skip_input ();
+          current_column += 2;
 
-	      return Token::make (DIFFERENT, loc);
-	    }
-	  break;*/
-            /*
+          return Token::make (DIFFERENT, loc);
+        }
+      break;*/
+        /*
         case '<':
             if (peek_input() == '>') {
                 skip_input();
@@ -183,21 +181,20 @@ Lexer::build_token()
             return Token::make(SEMICOLON, loc);
         case '<':
             current_char = peek_input();
-            switch (current_char){
-            	case '=':
-	            	skip_input();
-	                current_column += 2;
-	                return Token::make(LOWER_OR_EQUAL, loc);
-            	case '>':
-            		skip_input();
-	                current_column += 2;
-	                return Token::make(DIFFERENT, loc);
-	            default:
-	             	current_column++;
-                	return Token::make(LOWER, loc);
+            switch (current_char) {
+            case '=':
+                skip_input();
+                current_column += 2;
+                return Token::make(LOWER_OR_EQUAL, loc);
+            case '>':
+                skip_input();
+                current_column += 2;
+                return Token::make(DIFFERENT, loc);
+            default:
+                current_column++;
+                return Token::make(LOWER, loc);
+            }
 
-            }       
-                 
         case '>':
             if (peek_input() == '=') {
                 skip_input();
@@ -211,42 +208,42 @@ Lexer::build_token()
             }
             break;
         case '/':
-            if (peek_input() == '*') {                
-              int count_comment=1;
-              int fim_comentario = 0;
-              current_column++;
-              skip_input();
-              while (fim_comentario==0){
-                current_char = peek_input ();
-                skip_input ();
-                switch(current_char){
+            if (peek_input() == '*') {
+                int count_comment = 1;
+                int fim_comentario = 0;
+                current_column++;
+                skip_input();
+                while (fim_comentario == 0) {
+                    current_char = peek_input();
+                    skip_input();
+                    switch (current_char) {
                     case '\n':
-                        current_column=1;
+                        current_column = 1;
                         current_line++;
                         linemap_line_start(::line_table, current_line, max_column_hint);
                         break;
                     case '\t':
-                        current_column+=8;
+                        current_column += 8;
                         break;
                     case EOF:
-                        fim_comentario = 1;//nao usado
+                        fim_comentario = 1; //nao usado
                         return Token::make(END_OF_FILE, loc);
                         break;
                     case '/':
                         current_column++;
                         if (peek_input() == '*') {
-                            skip_input ();
+                            skip_input();
                             current_column++;
                             count_comment++;
                         }
-                        break;    
+                        break;
                     case '*':
                         current_column++;
                         if (peek_input() == '/') {
-                            skip_input ();
+                            skip_input();
                             current_column++;
                             count_comment--;
-                            if(count_comment==0){
+                            if (count_comment == 0) {
                                 fim_comentario = 1;
                             }
                         }
@@ -254,10 +251,11 @@ Lexer::build_token()
                     default:
                         current_column++;
                         break;
+                    }
                 }
-              }
-              continue;
-            }else {
+                continue;
+            }
+            else {
                 current_column++;
                 return Token::make(SLASH, loc);
             }
@@ -271,18 +269,18 @@ Lexer::build_token()
         case '|':
             current_column++;
             return Token::make(OR, loc);
-/*case '#':  comment 
+        /*case '#':  comment 
 current_column++;
 current_char = peek_input ();
 while (current_char != '\n')
 {
-	      skip_input ();
-	      current_column++; // won't be used
-	      current_char = peek_input ();
-	    }
-	  continue;
-	  break;
-	  */
+          skip_input ();
+          current_column++; // won't be used
+          current_char = peek_input ();
+        }
+      continue;
+      break;
+      */
         case '{':
             current_column++;
             return Token::make(LEFT_BRACE, loc);
@@ -391,7 +389,8 @@ while (current_char != '\n')
             }
             else if (current_char == '"') {
                 skip_input();
-            }else {
+            }
+            else {
                 gcc_unreachable();
             }
 
@@ -405,26 +404,24 @@ while (current_char != '\n')
 }
 
 const_TokenPtr
-Lexer::peek_token (int n)
+Lexer::peek_token(int n)
 {
-  return token_queue.peek (n);
+    return token_queue.peek(n);
 }
 
 const_TokenPtr
-Lexer::peek_token ()
+Lexer::peek_token()
 {
-  return peek_token (0);
+    return peek_token(0);
 }
 
-void
-Lexer::skip_token (int n)
+void Lexer::skip_token(int n)
 {
-  token_queue.skip (n);
+    token_queue.skip(n);
 }
 
-void
-Lexer::skip_token ()
+void Lexer::skip_token()
 {
-  skip_token (0);
+    skip_token(0);
 }
 }
