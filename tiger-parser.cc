@@ -212,8 +212,6 @@ namespace Tiger{
     if (t->get_id () == Tiger::SEMICOLON)
       lexer.skip_token ();
   }
-  void
-  Parser::parse_variable_declaration ()
   /*
   Tiny:
   var a:int;
@@ -223,13 +221,108 @@ namespace Tiger{
   var a :int :=1;
   var a :int :=nil;
   */
-  {
+
+  void
+  Parser::parse_variable_declaration () {
+    const_TokenPtr tok;
     if (!skip_token (Tiger::VAR))
       {
         skip_after_semicolon ();
         return;
       }
    
+    const_TokenPtr identifier = expect_token (Tiger::IDENTIFIER);
+    if (identifier == NULL)
+      {
+        skip_after_semicolon ();
+        return;
+      }
+    printf("\n\n .::INICIANDO::. \n");
+    tok = lexer.peek_token ();
+    if (tok->get_id () == Tiger::COLON){// var a :
+        printf("var a : \n");
+        skip_token (Tiger::COLON);
+        tok = lexer.peek_token ();
+        if (parse_type ()){// var a : int
+          printf("var a : int \n");
+          tok = lexer.peek_token ();
+          if(tok->get_id()==Tiger::ASSIG){//var a :int :=
+            printf("var a : int := \n");
+            skip_token (Tiger::ASSIG);
+            tok = lexer.peek_token ();
+            switch (tok->get_id()){
+                case Tiger::INTEGER_LITERAL:
+                  printf("var a : int := 1\n");
+                  skip_token (Tiger::INTEGER_LITERAL);
+                  break;
+                case Tiger::REAL_LITERAL:
+                  printf("var a : int := 1.1\n");
+                  skip_token (Tiger::REAL_LITERAL);
+                  break;
+                case Tiger::STRING_LITERAL:
+                  printf("var a : int := 'GG'\n");
+                  skip_token (Tiger::STRING_LITERAL);
+                  break;
+                case Tiger::NIL:
+                  printf("var a : int := nil\n");
+                  skip_token (Tiger::NIL);
+                  break;
+                default:
+                  printf("var a : int := unexpected \n");
+                  unexpected_token (tok);
+                  return;
+                  break;
+            }
+          }else if(tok->get_id()==Tiger::SEMICOLON){//var a :int;
+            printf("var a : int;\n");
+            skip_token (Tiger::SEMICOLON);
+            return;
+          }else{
+            printf("var a : unexpected \n");
+            unexpected_token (tok);
+            return;
+          }
+        }else{
+            printf("var a : unexpected \n");
+            unexpected_token (tok);
+            return;
+        }
+    }else if (tok->get_id () == Tiger::ASSIG){ //var a:=
+        skip_token (Tiger::ASSIG);
+        tok = lexer.peek_token ();
+          switch (tok->get_id()){
+              case Tiger::INTEGER_LITERAL:
+                skip_token (Tiger::INTEGER_LITERAL);
+                break;
+              case Tiger::REAL_LITERAL:
+                skip_token (Tiger::REAL_LITERAL);
+                break;
+              case Tiger::STRING_LITERAL:
+                skip_token (Tiger::STRING_LITERAL);
+                break;
+              default:
+                unexpected_token (tok);
+                return;
+                break;
+          }
+        
+    }else{
+      printf("var a  unexpected \n");
+      unexpected_token (tok);
+      return;
+    }  
+    skip_token (Tiger::SEMICOLON);
+  }
+
+/*
+  void
+  Parser::parse_variable_declaration ()  
+  {
+    if (!skip_token (Tiger::VAR))
+      {
+        skip_after_semicolon ();
+        return;
+      }
     const_TokenPtr identifier = expect_token (Tiger::IDENTIFIER);
     if (identifier == NULL)
       {
@@ -247,7 +340,7 @@ namespace Tiger{
        return;
    
     skip_token (Tiger::SEMICOLON);
-  }
+  }*/
   bool
   Parser::parse_type ()
   {
@@ -266,16 +359,13 @@ namespace Tiger{
         return false;
       }
   }
-
   /*
   Here we use a function skip_token that given a token id, 
   checks if the current token has that same id. If it has, 
   it just skips it and returns true. Otherwise diagnoses an 
   error and returns false. When skip_token fails (i.e. returns false)
   we immediately go to panic mode and give up parsing the current statement.
-  As you can see this code quickly becomes tedious and repetitive.
-  No wonder there exist tools, like ANTLR by Terence Parr, 
-  that automate the code generation of recursive descent recognizers.
+
   */
   bool
   Parser::skip_token (Tiger::TokenId token_id)
@@ -534,7 +624,6 @@ tiger_parse_file (const char *filename)
   Tiger::const_TokenPtr tok = lex.peek_token ();
   for (;;)
     {
-      break;
       bool has_text = tok->get_id () == Tiger::IDENTIFIER
           || tok->get_id () == Tiger::INTEGER_LITERAL
           || tok->get_id () == Tiger::REAL_LITERAL
@@ -552,10 +641,24 @@ tiger_parse_file (const char *filename)
       lex.skip_token ();
       tok = lex.peek_token ();
     }
-  Tiger::Parser parser (lex);
+
+
+
+    FILE *file2 = fopen (filename, "r");
+  if (file2 == NULL)
+    {
+      fatal_error (UNKNOWN_LOCATION, "cannot open filename %s: %m", filename);
+    }
+ 
+  // Here we would parse our file
+  Tiger::Lexer lexer (filename, file2);
+ 
+   tok = lexer.peek_token ();
+  Tiger::Parser parser (lexer);
 
   parser.parse_program ();
 
   fclose (file);
+  fclose (file2);
 }
 /*comentado no tiger-parser.cc e adicionado aqui */

@@ -1,0 +1,197 @@
+[1mdiff --git a/my_folder/tests/test_var.tiger b/my_folder/tests/test_var.tiger[m
+[1mdeleted file mode 100644[m
+[1mindex 851aa31..0000000[m
+[1m--- a/my_folder/tests/test_var.tiger[m
+[1m+++ /dev/null[m
+[36m@@ -1,4 +0,0 @@[m
+[31m-  var a := 1;[m
+[31m-  var a :int;[m
+[31m-  var a :int :=1;[m
+[31m-  var a :int :=nil;[m
+\ No newline at end of file[m
+[1mdiff --git a/tiger-parser.cc b/tiger-parser.cc[m
+[1mindex eddb029..8c736e6 100644[m
+[1m--- a/tiger-parser.cc[m
+[1m+++ b/tiger-parser.cc[m
+[36m@@ -212,8 +212,6 @@[m [mnamespace Tiger{[m
+     if (t->get_id () == Tiger::SEMICOLON)[m
+       lexer.skip_token ();[m
+   }[m
+[31m-  void[m
+[31m-  Parser::parse_variable_declaration ()[m
+   /*[m
+   Tiny:[m
+   var a:int;[m
+[36m@@ -223,7 +221,10 @@[m [mnamespace Tiger{[m
+   var a :int :=1;[m
+   var a :int :=nil;[m
+   */[m
+[31m-  {[m
+[32m+[m
+[32m+[m[32m  void[m
+[32m+[m[32m  Parser::parse_variable_declaration () {[m
+[32m+[m[32m    const_TokenPtr tok;[m
+     if (!skip_token (Tiger::VAR))[m
+       {[m
+         skip_after_semicolon ();[m
+[36m@@ -236,6 +237,98 @@[m [mnamespace Tiger{[m
+         skip_after_semicolon ();[m
+         return;[m
+       }[m
+[32m+[m[32m    printf("\n\n .::INICIANDO::. \n");[m
+[32m+[m[32m    tok = lexer.peek_token ();[m
+[32m+[m[32m    if (tok->get_id () == Tiger::COLON){// var a :[m
+[32m+[m[32m        printf("var a : \n");[m
+[32m+[m[32m        skip_token (Tiger::COLON);[m
+[32m+[m[32m        tok = lexer.peek_token ();[m
+[32m+[m[32m        if (parse_type ()){// var a : int[m
+[32m+[m[32m          printf("var a : int \n");[m
+[32m+[m[32m          tok = lexer.peek_token ();[m
+[32m+[m[32m          if(tok->get_id()==Tiger::ASSIG){//var a :int :=[m
+[32m+[m[32m            printf("var a : int := \n");[m
+[32m+[m[32m            skip_token (Tiger::ASSIG);[m
+[32m+[m[32m            tok = lexer.peek_token ();[m
+[32m+[m[32m            switch (tok->get_id()){[m
+[32m+[m[32m                case Tiger::INTEGER_LITERAL:[m
+[32m+[m[32m                  printf("var a : int := 1\n");[m
+[32m+[m[32m                  skip_token (Tiger::INTEGER_LITERAL);[m
+[32m+[m[32m                  break;[m
+[32m+[m[32m                case Tiger::REAL_LITERAL:[m
+[32m+[m[32m                  printf("var a : int := 1.1\n");[m
+[32m+[m[32m                  skip_token (Tiger::REAL_LITERAL);[m
+[32m+[m[32m                  break;[m
+[32m+[m[32m                case Tiger::STRING_LITERAL:[m
+[32m+[m[32m                  printf("var a : int := 'GG'\n");[m
+[32m+[m[32m                  skip_token (Tiger::STRING_LITERAL);[m
+[32m+[m[32m                  break;[m
+[32m+[m[32m                case Tiger::NIL:[m
+[32m+[m[32m                  printf("var a : int := nil\n");[m
+[32m+[m[32m                  skip_token (Tiger::NIL);[m
+[32m+[m[32m                  break;[m
+[32m+[m[32m                default:[m
+[32m+[m[32m                  printf("var a : int := unexpected \n");[m
+[32m+[m[32m                  unexpected_token (tok);[m
+[32m+[m[32m                  return;[m
+[32m+[m[32m                  break;[m
+[32m+[m[32m            }[m
+[32m+[m[32m          }else if(tok->get_id()==Tiger::SEMICOLON){//var a :int;[m
+[32m+[m[32m            printf("var a : int;\n");[m
+[32m+[m[32m            skip_token (Tiger::SEMICOLON);[m
+[32m+[m[32m            return;[m
+[32m+[m[32m          }else{[m
+[32m+[m[32m            printf("var a : unexpected \n");[m
+[32m+[m[32m            unexpected_token (tok);[m
+[32m+[m[32m            return;[m
+[32m+[m[32m          }[m
+[32m+[m[32m        }else{[m
+[32m+[m[32m            printf("var a : unexpected \n");[m
+[32m+[m[32m            unexpected_token (tok);[m
+[32m+[m[32m            return;[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }else if (tok->get_id () == Tiger::ASSIG){ //var a:=[m
+[32m+[m[32m        skip_token (Tiger::ASSIG);[m
+[32m+[m[32m        tok = lexer.peek_token ();[m
+[32m+[m[32m          switch (tok->get_id()){[m
+[32m+[m[32m              case Tiger::INTEGER_LITERAL:[m
+[32m+[m[32m                skip_token (Tiger::INTEGER_LITERAL);[m
+[32m+[m[32m                break;[m
+[32m+[m[32m              case Tiger::REAL_LITERAL:[m
+[32m+[m[32m                skip_token (Tiger::REAL_LITERAL);[m
+[32m+[m[32m                break;[m
+[32m+[m[32m              case Tiger::STRING_LITERAL:[m
+[32m+[m[32m                skip_token (Tiger::STRING_LITERAL);[m
+[32m+[m[32m                break;[m
+[32m+[m[32m              default:[m
+[32m+[m[32m                unexpected_token (tok);[m
+[32m+[m[32m                return;[m
+[32m+[m[32m                break;[m
+[32m+[m[32m          }[m
+[32m+[m[41m        [m
+[32m+[m[32m    }else{[m
+[32m+[m[32m      printf("var a  unexpected \n");[m
+[32m+[m[32m      unexpected_token (tok);[m
+[32m+[m[32m      return;[m
+[32m+[m[32m    }[m[41m  [m
+[32m+[m[32m    skip_token (Tiger::SEMICOLON);[m
+[32m+[m[32m  }[m
+[32m+[m
+[32m+[m[32m/*[m
+[32m+[m[32m  void[m
+[32m+[m[32m  Parser::parse_variable_declaration ()[m[41m  [m
+[32m+[m[32m  {[m
+[32m+[m[32m    if (!skip_token (Tiger::VAR))[m
+[32m+[m[32m      {[m
+[32m+[m[32m        skip_after_semicolon ();[m
+[32m+[m[32m        return;[m
+[32m+[m[32m      }[m
+[32m+[m[32m    const_TokenPtr identifier = expect_token (Tiger::IDENTIFIER);[m
+[32m+[m[32m    if (identifier == NULL)[m
+[32m+[m[32m      {[m
+[32m+[m[32m        skip_after_semicolon ();[m
+[32m+[m[32m        return;[m
+[32m+[m[32m      }[m
+    [m
+     if (!skip_token (Tiger::COLON))[m
+       {[m
+[36m@@ -247,7 +340,7 @@[m [mnamespace Tiger{[m
+        return;[m
+    [m
+     skip_token (Tiger::SEMICOLON);[m
+[31m-  }[m
+[32m+[m[32m  }*/[m
+   bool[m
+   Parser::parse_type ()[m
+   {[m
+[36m@@ -266,16 +359,13 @@[m [mnamespace Tiger{[m
+         return false;[m
+       }[m
+   }[m
+[31m-[m
+   /*[m
+   Here we use a function skip_token that given a token id, [m
+   checks if the current token has that same id. If it has, [m
+   it just skips it and returns true. Otherwise diagnoses an [m
+   error and returns false. When skip_token fails (i.e. returns false)[m
+   we immediately go to panic mode and give up parsing the current statement.[m
+[31m-  As you can see this code quickly becomes tedious and repetitive.[m
+[31m-  No wonder there exist tools, like ANTLR by Terence Parr, [m
+[31m-  that automate the code generation of recursive descent recognizers.[m
+[32m+[m
+   */[m
+   bool[m
+   Parser::skip_token (Tiger::TokenId token_id)[m
+[36m@@ -534,7 +624,6 @@[m [mtiger_parse_file (const char *filename)[m
+   Tiger::const_TokenPtr tok = lex.peek_token ();[m
+   for (;;)[m
+     {[m
+[31m-      break;[m
+       bool has_text = tok->get_id () == Tiger::IDENTIFIER[m
+           || tok->get_id () == Tiger::INTEGER_LITERAL[m
+           || tok->get_id () == Tiger::REAL_LITERAL[m
+[36m@@ -552,10 +641,24 @@[m [mtiger_parse_file (const char *filename)[m
+       lex.skip_token ();[m
+       tok = lex.peek_token ();[m
+     }[m
+[31m-  Tiger::Parser parser (lex);[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32m    FILE *file2 = fopen (filename, "r");[m
+[32m+[m[32m  if (file2 == NULL)[m
+[32m+[m[32m    {[m
+[32m+[m[32m      fatal_error (UNKNOWN_LOCATION, "cannot open filename %s: %m", filename);[m
+[32m+[m[32m    }[m
+[32m+[m[41m [m
+[32m+[m[32m  // Here we would parse our file[m
+[32m+[m[32m  Tiger::Lexer lexer (filename, file2);[m
+[32m+[m[41m [m
+[32m+[m[32m   tok = lexer.peek_token ();[m
+[32m+[m[32m  Tiger::Parser parser (lexer);[m
+ [m
+   parser.parse_program ();[m
+ [m
+   fclose (file);[m
+[32m+[m[32m  fclose (file2);[m
+ }[m
+ /*comentado no tiger-parser.cc e adicionado aqui */[m
+\ No newline at end of file[m

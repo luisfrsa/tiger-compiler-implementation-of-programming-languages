@@ -1,4 +1,8 @@
   var a := 1;
+  var a :int :=nil;
+  var a := 1;
   var a :int;
+  var a := 1;  
   var a :int :=1;
+  var a := 1;
   var a :int :=nil;
