@@ -1,4 +1,4 @@
-# for.tiny
+# for.tiger
 var i : int;
 var s : int;
 s := 0;
@@ -8,7 +8,7 @@ end
 write s;
 
 
-# sqrt.tiny
+# sqrt.tiger
 var s : float;
 s := 2.0;
  
@@ -24,7 +24,7 @@ write x;
 
 var a1 : int(0:9);       # array 10 int
 
-# bubble.tiny
+# bubble.tiger
 var n : int;
 write "Enter the number of integers:";
 read n;

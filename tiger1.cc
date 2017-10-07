@@ -15,25 +15,24 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
+#include "config.h"
+#include "system.h"
+#include "coretypes.h"
+#include "target.h"
+#include "tree.h"
+#include "gimple-expr.h"
+#include "diagnostic.h"
+#include "opts.h"
+#include "fold-const.h"
+#include "gimplify.h"
+#include "stor-layout.h"
+#include "debug.h"
+#include "convert.h"
+#include "langhooks.h"
+#include "langhooks-def.h"
+#include "common/common-target.h"
+#include "tiger/tiger-parser.h"
 
-#include "config.h"       
-#include "system.h"       
-#include "coretypes.h"       
-#include "target.h"       
-#include "tree.h"       
-#include "gimple-expr.h"       
-#include "diagnostic.h"       
-#include "opts.h"       
-#include "fold-const.h"       
-#include "gimplify.h"       
-#include "stor-layout.h"       
-#include "debug.h"       
-#include "convert.h"       
-#include "langhooks.h"       
-#include "langhooks-def.h"       
-#include "common/common-target.h"       
-#include "tiger/tiger-parser.h"       
-#include "tiger/tiger-lexer.h"   
 /* Language-dependent contents of a type.  */
 
 struct GTY (()) lang_type
@@ -94,10 +93,6 @@ tiger_langhook_parse_file (void)
 {
   tiger_parse_files (num_in_fnames, in_fnames);
 }
-
-/*aqui estava carregando o arquivo tiger_parse_file*/
-
-
 
 static tree
 tiger_langhook_type_for_mode (enum machine_mode mode, int unsignedp)

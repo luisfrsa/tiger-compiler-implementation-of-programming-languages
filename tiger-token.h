@@ -16,9 +16,9 @@ namespace Tiger
 // TIGER_TOKEN_KEYWORD(name, identifier)
 //
 // Keep TIGER_TOKEN_KEYWORD sorted
-//REMOVER: true? false?, read, record??
-  //virgula nao esta no lexer
-  //adicionado string
+/*
+MANTENDO FLOAT, BOOL, TRUE E FALSE LITERAL, write (trocar por print)
+*/
 #define TIGER_TOKEN_LIST                                                        \
   TIGER_TOKEN (FIRST_TOKEN, "<first-token-marker>")                             \
   TIGER_TOKEN (END_OF_FILE, "end of file")                                      \
@@ -53,11 +53,14 @@ namespace Tiger
                                                                                 \
   TIGER_TOKEN_KEYWORD (AND, "&")                                                \
   TIGER_TOKEN_KEYWORD (ARRAY, "array")                                          \
+  TIGER_TOKEN_KEYWORD (BOOL, "bool")                                            \
   TIGER_TOKEN_KEYWORD (DO, "do")                                                \
   TIGER_TOKEN_KEYWORD (ELSE, "else")                                            \
   TIGER_TOKEN_KEYWORD (END, "end")                                              \
-  TIGER_TOKEN_KEYWORD (FUNCTION, "function")                                    \
+  TIGER_TOKEN_KEYWORD (FALSE_LITERAL, "false")                                  \
+  TIGER_TOKEN_KEYWORD (FLOAT, "float")                                          \
   TIGER_TOKEN_KEYWORD (FOR, "for")                                              \
+  TIGER_TOKEN_KEYWORD (FUNCTION, "function")                                    \
   TIGER_TOKEN_KEYWORD (IF, "if")                                                \
   TIGER_TOKEN_KEYWORD (IN, "in")                                                \
   TIGER_TOKEN_KEYWORD (INT, "int")                                              \
@@ -66,12 +69,14 @@ namespace Tiger
   TIGER_TOKEN_KEYWORD (NOT, "not")                                              \
   TIGER_TOKEN_KEYWORD (OF, "of")                                                \
   TIGER_TOKEN_KEYWORD (OR, "|")                                                 \
+  TIGER_TOKEN_KEYWORD (PRINT, "print")                                          \
   TIGER_TOKEN_KEYWORD (READ, "read")                                            \
   TIGER_TOKEN_KEYWORD (REAL, "real")                                            \
   TIGER_TOKEN_KEYWORD (RECORD, "record")                                        \
   TIGER_TOKEN_KEYWORD (STRING, "string")                                        \
   TIGER_TOKEN_KEYWORD (THEN, "then")                                            \
   TIGER_TOKEN_KEYWORD (TO, "to")                                                \
+  TIGER_TOKEN_KEYWORD (TRUE_LITERAL, "true")                                    \
   TIGER_TOKEN_KEYWORD (TYPE, "type")                                            \
   TIGER_TOKEN_KEYWORD (VAR, "var")                                              \
   TIGER_TOKEN_KEYWORD (WHILE, "while")                                          \

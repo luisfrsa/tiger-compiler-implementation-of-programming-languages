@@ -1,0 +1,77 @@
+Grammar for Tiger Imperative Language (TIL)
+==========================================
+
+Based on the grammar in
+
+   http://www.program-transformation.org/Sts/TigerImperativeLanguage
+
+
+Grammar
+-------
+
+program -> statement*
+
+statement ->  declaration
+           |  assignment_statement
+           |  if_statement
+           |  while_statement
+           |  for_statement
+           |  read_statement
+           |  write_statement
+
+% Variables
+declaration -> "var" identifier ":" type ";"
+
+type -> "int"
+      | "float"
+      | type "[" expression "]"     % array of given length with valid
+                                    % indexes o to expression - 1
+      | type "(" expression ":" expression ")"    % array with given indexes
+                                                  % from first expression to second one
+
+assignment_statement -> identifier ":=" expression ";"
+
+if_statement -> "if" expression "then" 
+                    statement* 
+                "end"
+             |  "if" expression "then" 
+                    statement* 
+                "else" 
+                    statement* 
+                "end"
+
+% While loop 
+while_statement -> "while" expression "do"
+                      statement* 
+                   "end"
+
+% Declaring for
+for_statement -> "for"  identifier ":=" expression "to" expression "do"
+                     statement*
+                 "end"
+
+read_statement -> "read" expression ";"               % expression designates
+                                                      % a variable or array
+                                                      % access
+
+write_statement -> "write" expression ";"
+
+% Simple 
+expression -> primary
+           |  unop expression
+           |  expression binop expression
+
+primary -> identifier
+        |  identifier "[" expression "]"              % array access
+        |  integer-literal
+        |  real-literal
+        |  string
+        |  "(" expression ")"
+
+unop -> not                                           % lowest priority
+     |  "+" | "-"                                     % highest priority
+
+binop ->  "and" | "or"                                % lowest priority
+       |  "=" | "!=" | "<" | "<=" | ">" | ">="
+       |  "+" | "-"
+       |  "*" | "/"  | "%"                            % highest priority

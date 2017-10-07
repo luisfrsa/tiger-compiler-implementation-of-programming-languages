@@ -8,5 +8,19 @@ make -j$(getconf _NPROCESSORS_ONLN)
 make install
 
 
+
+TESTES
 ../gcc-install/bin/gcctiger -c ../gcc-src/gcc/tiger/my_folder/tests/
 ../gcc-install/bin/gcctiger -c ../gcc-src/gcc/tiger/my_folder/tests/queens.tiger 
+
+../gcc-install/bin/gcctiny -c ../gcc-src/gcc/tiger/my_folder/tests_tiny/
+../gcc-install/bin/gcctiger -c ../gcc-src/gcc/tiger/my_folder/tests_tiny/
+
+
+COMPILACAO
+../gcc-install/bin/gcctiger -o record2.tg ../gcc-src/gcc/tiger/my_folder/tests_tiny/record2.tiny
+
+
+ip: 10.30.11.19
+usuário: ra67403inf
+senha: ra67403

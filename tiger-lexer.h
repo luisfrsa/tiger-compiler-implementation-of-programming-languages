@@ -27,9 +27,6 @@ private:
 
   TokenPtr build_token ();
 
-  
- 
-
 public:
   Lexer (const char *filename, FILE *input);
   ~Lexer ();
