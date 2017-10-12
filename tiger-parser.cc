@@ -209,7 +209,13 @@ Parser::skip_after_end ()
   if (t->get_id () == Tiger::END)
     lexer.skip_token ();
 }
-
+/*
+===(5)===
+Function expect_token checks the current token.
+If its id is the same as the one we expect, 
+it skips and returns it, otherwise it diagnoses 
+an error and returns an empty pointer (i.e. a null pointer).
+*/
 const_TokenPtr
 Parser::expect_token (Tiger::TokenId token_id)
 {
@@ -226,7 +232,18 @@ Parser::expect_token (Tiger::TokenId token_id)
       return const_TokenPtr ();
     }
 }
-
+/*
+===(4)===
+Here we use a function skip_token that given a token id, 
+checks if the current token has that same id. If it has, 
+it just skips it and returns true. Otherwise diagnoses an 
+error and returns false. When skip_token fails (i.e. returns 
+false) we immediately go to panic mode and give up parsing 
+the current statement.  No wonder there exist tools, 
+like ANTLR by Terence Parr, that automate the code generation 
+of recursive descent recognizers.
+Function skip_token simply forwards to expect_token.
+*/
 bool
 Parser::skip_token (Tiger::TokenId token_id)
 {
@@ -310,7 +327,16 @@ Parser::done_end_or_else ()
   return (t->get_id () == Tiger::END || t->get_id () == Tiger::ELSE
 	  || t->get_id () == Tiger::END_OF_FILE);
 }
-
+/*
+===(1)===
+This is fine but if you check the syntax of tiny, you will see that the condition 
+of finalization of a 〈statement-seq〉 is not always the end of file. Sometimes
+can be end (in the then or else part of an if statement, int the body for statement
+and in the body of a while statement) and sometimes is else (in the then part 
+of an if statement). So this means that parse_statement_seq can be reused if
+we parameterize the finalization condition. Something like this.
+*done pode ser done_end_of_file, etc
+*/
 void
 Parser::parse_statement_seq (bool (Parser::*done) ())
 {
@@ -381,6 +407,16 @@ Parser::get_current_stmt_list ()
   return stack_stmt_list.back ();
 }
 
+
+/*
+===(2)===
+We peek the current token and we check which 
+statement it can initiate. If no statement can 
+be initiated given the current token, the we 
+call a diagnostic function with the unexpected 
+token. We do some minimal error recovery by skiping 
+all tokens until a semicolon is found.
+*/
 Tree
 Parser::parse_statement ()
 {
@@ -424,6 +460,13 @@ Parser::parse_statement ()
     default:
       unexpected_token (t);
       skip_after_semicolon ();
+      /*
+      ===(3)===
+      error_at is a function that tells GCC 
+      to emit a diagnostic in the given location 
+      we just complain of an unexpected token. 
+      For instance the following erroneous program.
+      */
       return Tree::error ();
       break;
     }
@@ -467,15 +510,16 @@ Parser::parse_variable_declaration ()
   if (scope.get_current_mapping ().get (identifier->get_str ()))
     {
       error_at (identifier->get_locus (),
-		"name '%s' already declared in this scope",
-		identifier->get_str ().c_str ());
+		  "name '%s' already declared in this scope",
+		  identifier->get_str ().c_str ());
     }
   SymbolPtr sym (new Symbol (Tiger::VARIABLE, identifier->get_str ()));
   scope.get_current_mapping ().insert (sym);
 
-  Tree decl = build_decl (identifier->get_locus (), VAR_DECL,
-			  get_identifier (sym->get_name ().c_str ()),
-			  type_tree.get_tree ());
+  Tree decl = build_decl (identifier->get_locus (),
+                          VAR_DECL,
+			                    get_identifier (sym->get_name ().c_str ()),
+			                    type_tree.get_tree ());
   DECL_CONTEXT (decl.get_tree()) = main_fndecl;
 
   gcc_assert (!stack_var_decl_chain.empty ());
@@ -964,7 +1008,24 @@ Parser::build_if_statement (Tree bool_expr, Tree then_part, Tree else_part)
 
   return stmt_list.get_tree ();
 }
+/*
+===(5)===
+Another interesting statement is the if-statement. Let’s recall its syntax definition.
+〈if〉 → if 〈expression〉 then 〈statement〉* end |
+        if 〈expression〉 then 〈statement〉* else 〈statement〉* end
+ As shown, deriving a parse function for the rule 〈if〉 is not obvious because the 
+ two forms share a lot of elements. It may help to split the rule 〈if〉 in two rules follows.
+〈if〉 → 〈if-then〉 end |
+        〈if-then〉 else 〈statement〉* end |
+        〈if-then〉 → if 〈expression〉 then 〈statement〉*
 
+From this definition it is clear that we have to parse first an if, followed by an 
+expression, followed by a then and followed by a statement sequence. In this case
+the statement sequence will finish when we encounter an end or an else token. If
+we find an end we are done parsing the if statement. If we find an else, it 
+means that we still have to parse a statement sequence (this time the sequence 
+finishes only if we encounter an end) and then an end token.        
+*/
 Tree
 Parser::parse_if_statement ()
 {
@@ -1390,7 +1451,31 @@ Parser::parse_write_statement ()
 
   gcc_unreachable ();
 }
+/*
+===(6)===
+A Pratt parser defines the concept of binding power as some sort of priority number: the 
+higher the binding power the more priority the operand has. This parser associates three 
+extra values to the tokens of expressions: a left binding power, a null denotation 
+function and a left denotation function.
 
+Parsing an expression requires a right binding power. A top level expression 
+will use the lowest priority possible. Then the parser starts by peeking the 
+current token t1 and skipping it. Then it invokes the null denotation function 
+of t1. If this token cannot appear at this point then its null denotation 
+function will diagnose an error and the parsing will end at this point. 
+Otherwise the null denotation function will do something (that may include 
+advancing the token stream, more on this later). Once we are back from 
+the null denotation, the parser checks if the current right binding power 
+is lower or than that of the current token (call it t2, but note that 
+it may not be the next one after t1). If it is not, parsing ends here. 
+Otherwise the parser skips the token and the left denotation function is 
+invoked on t2. The left denotation function (will do something, including 
+advancing the current token, more on this later). Once we are back from the 
+left denotation we will check again if the current token has a higher left 
+binding power than the current right binding power and proceed likewise.
+
+Ok, I tried, but the explanation above is rather dense. Behold the stunning simplicity of this parser at its core.
+*/
 // This is a Pratt parser
 Tree
 Parser::parse_expression (int right_binding_power)
@@ -1502,35 +1587,49 @@ Parser::left_binding_power (const_TokenPtr token)
       return LBP_LOWEST;
     }
 }
+/*
+===(7)===
+There is little to do now for identifiers, real, integer and string literals. 
+So they trivially return true (lines 6 to 10).
 
+If the current token is ( (line 11) it means that we have to parse a whole 
+expression. So we do by recursively invoking parse_expression (with the lowest 
+priority possible, as if it were a top-level expression). When we return from 
+parse_expression we have to make sure that the current token is ) (line 16).
+
+If the current token is +, – or not (lines 18, 24, 30) it means that this is 
+a unary operator. We will invoke parse_expression recursively with the 
+appropiate priority for each operand (LBP_UNARY_PLUS, LBP_UNARY_NEG, LBP_LOGICAL_NOT, more on this later).
+
+It may not be obvious now, but tok, is not the current token in the input 
+stream but the previous one since parse_expression already skipped tok before calling null_denotation.
+*/
 // This is invoked when a token (including prefix operands) is found at a
 // "prefix" position
 Tree
 Parser::null_denotation (const_TokenPtr tok)
 {
-  switch (tok->get_id ())
-    {
-    case Tiger::IDENTIFIER:
-      {
-	SymbolPtr s = query_variable (tok->get_str (), tok->get_locus ());
-	if (s == NULL)
-	  return Tree::error ();
-	return Tree (s->get_tree_decl (), tok->get_locus ());
-      }
+  switch (tok->get_id ()){
+    case Tiger::IDENTIFIER:{
+	     SymbolPtr s = query_variable (tok->get_str (), tok->get_locus ());
+	     if (s == NULL)
+	       return Tree::error ();
+	     return Tree (s->get_tree_decl (), tok->get_locus ());
+    }
     case Tiger::INTEGER_LITERAL:
       // FIXME : check ranges
       return Tree (build_int_cst_type (integer_type_node,
-				       atoi (tok->get_str ().c_str ())),
-		   tok->get_locus ());
+				           atoi (tok->get_str ().c_str ())),
+		               tok->get_locus ());
       break;
-    case Tiger::REAL_LITERAL:
-      {
-	REAL_VALUE_TYPE real_value;
-	real_from_string3 (&real_value, tok->get_str ().c_str (),
-			   TYPE_MODE (float_type_node));
+    case Tiger::REAL_LITERAL: {
+	     REAL_VALUE_TYPE real_value;
+	     real_from_string3 (&real_value,
+                          tok->get_str ().c_str (),
+			                    TYPE_MODE (float_type_node));
 
-	return Tree (build_real (float_type_node, real_value),
-		     tok->get_locus ());
+	     return Tree (build_real (float_type_node, real_value),
+		                tok->get_locus ());
       }
       break;
     case Tiger::STRING_LITERAL:
@@ -1966,6 +2065,17 @@ Parser::binary_field_ref (const const_TokenPtr tok, Tree left)
 		     Tree ());
 }
 
+/*
+===(8)===
+Rather than making a relatively large switch 
+(like we did in null_denotation), here we call 
+a function that given a token will return us a 
+pointer to the member function that implements 
+the left denotation for token tok. We could have 
+taken the same approach in the null_denotation 
+function but given that there are much less unary 
+operators it looked like unnecesary.
+*/
 // This is invoked when a token (likely an operand) is found at a (likely
 // infix) non-prefix position
 Tree
@@ -2065,7 +2175,6 @@ static void
 tiger_parse_file (const char *filename)
 {
   tiger_parse_file_test_lex(filename);
-  return;
   // FIXME: handle stdin "-"
   FILE *file = fopen (filename, "r");
   if (file == NULL)

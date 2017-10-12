@@ -334,7 +334,7 @@ Lexer::build_token ()
 	    }
 
 	  current_column += length;
-	  printf("\n Keyworld -> %s\n",str.c_str());
+	  //printf("\n Keyworld -> %s\n",str.c_str());
 	  TokenId keyword = classify_keyword (str);
 	  if (keyword == IDENTIFIER)
 	    {

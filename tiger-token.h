@@ -42,7 +42,7 @@ MANTENDO FLOAT, BOOL, TRUE E FALSE LITERAL, write (trocar por print)
   TIGER_TOKEN (IDENTIFIER, "identifier")                                        \
   TIGER_TOKEN (INTEGER_LITERAL, "integer literal")                              \
   TIGER_TOKEN (REAL_LITERAL, "real literal")                                    \
-  TIGER_TOKEN (STRING_LITERAL, "string literal")                                \ 
+  TIGER_TOKEN (STRING_LITERAL, "string literal")                                \
   TIGER_TOKEN (LEFT_SQUARE, "[")                                                \
   TIGER_TOKEN (RIGHT_SQUARE, "]")                                               \
   TIGER_TOKEN (DOT, ".")                                                        \
