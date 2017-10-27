@@ -13,6 +13,13 @@
 #include <fstream> //alteracao_luis
 //using namespace std; //alteracao_luis
 
+/*
+tiny2tiger
+http://thinkingeek.com/2016/01/16/tiny-gcc-front-part-5/
+We will use the class Symbol to represent a named entity of a tiny program. 
+So far the only named entities we have in tiny are variables. Other languages 
+may have types, constants and functions in their set of entities with names. Symbol class would be used as well for such entities.
+*/
 namespace Tiger
 {
 

@@ -20,6 +20,16 @@ Scope::pop_scope ()
   map_stack.pop_back ();
 }
 
+/*
+We can manage the current symbol mapping using Scope::push_scope() 
+and Scope::pop_scope(). The former will be used when we need a fresh
+mapping (as it will happen when handling if, while and for statements). 
+Scope::get_current_mapping returns the current mapping (i.e. the one that 
+was created in the last push_scope that has not been popped yet).
+
+Function Scope::lookup is used to get the last mapping for a given string 
+(or null if there is no such mapping).
+*/
 SymbolPtr
 Scope::lookup (const std::string &str)
 {

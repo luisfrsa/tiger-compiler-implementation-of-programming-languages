@@ -473,17 +473,53 @@ Parser::parse_statement ()
 
   gcc_unreachable ();
 }
+/*
+We first parse the syntactic elements of a variable declaration. We skip the initial var in lines 4 to 8. 
+In line 10 we keep the identifier token because it will be used later. We skip the colon in lines 17 to 21. 
+In line 23 we parse the type (by calling parse_type, more on this later) and finally in line 31 we skip the semicolon.
 
+Now the semantic checks of a variable declaration can start. In line 33, we check if the current mapping 
+of the scope already contains a mapping for the identifier. If there is such a mapping, this is an error 
+and we give up, otherwise we create a new symbol (line 39) using the given identifier and we insert it 
+into the current mapping (line 40).
+
+Now we need to create some GENERIC for this new variable declaration (line 43). It will have a tree 
+code of VAR_DECL. The first operand of that tree is an IDENTIFIER_NODE for the identifier itself. 
+These trees are shared in GENERIC: two identical identifiers will use the same tree. For this reason 
+we need to request an IDENTIFIER_NODE rather than creating it manually. We do that calling the 
+(GCC-provided) function get_identifier (line 44). The second operand that we will need is the type 
+of the declaration. This was obtained in an earlier call to parse_type. Note that we are calling 
+the (GCC-provided) function build_decl. This is so because there is an extra step (setting some 
+internal type and operation mode of the declaration) that has to be performed for a VAR_DECL. 
+Function build_decl takes care of that for us and it is in practice like calling build2_loc.
+
+In line 50 we associate the new Symbol with the VAR_DECL we have created. We do this because every 
+time we need to refer to an existing variable in GENERIC we will need to use a VAR_DECL. But it cannot 
+be a new VAR_DECL every time since this would mean a new variable with the same name. So we just 
+keep a single VAR_DECL in a Symbol so we can reuse it as many times as needed.
+
+The VAR_DECL is also kept in the top list of the stack stack_var_decl_chain. We will need this 
+later when we talk about blocks.
+  TIGER
+  var a := 1;
+  var a :int :=nil;
+  var a :int :=1;
+  TINY
+  var n : int;
+*/
 Tree
-Parser::parse_variable_declaration ()
-{
+Parser::parse_variable_declaration (){
+  Tree type_tree;
+  Tree expr;
+  const_TokenPtr first_of_expr;
+  const_TokenPtr assig_tok;
   // variable_declaration -> "var" identifier ":" type ";"
   if (!skip_token (Tiger::VAR))
     {
       skip_after_semicolon ();
       return Tree::error ();
     }
-
+  /*verifica se é identificador*/
   const_TokenPtr identifier = expect_token (Tiger::IDENTIFIER);
   if (identifier == NULL)
     {
@@ -491,47 +527,102 @@ Parser::parse_variable_declaration ()
       return Tree::error ();
     }
 
-  if (!skip_token (Tiger::COLON))
-    {
-      skip_after_semicolon ();
-      return Tree::error ();
-    }
+  /*verifica se é : ou :=*/
+  const_TokenPtr tok = lexer.peek_token ();
+  printf("\n Colon : ");
+  if (tok->get_id () == Tiger::COLON){ //var a :
+    skip_token (Tiger::COLON);
+    type_tree = parse_type (); //var a :int
+    printf("\n Type int");
 
-  Tree type_tree = parse_type ();
-
-  if (type_tree.is_error ())
-    {
+    if (type_tree.is_error ()){
       skip_after_semicolon();
       return Tree::error ();
+    }    
+    printf("\n assign :=");
+    assig_tok = expect_token (Tiger::ASSIG);
+    if (assig_tok == NULL){//var a :int:=
+        skip_after_semicolon ();
+        return Tree::error ();
     }
+    first_of_expr = lexer.peek_token ();
+    expr = parse_expression ();
+    printf("\n EXP");
+    if (expr.is_error ())
+      return Tree::error ();
 
+  }else{
+    assig_tok = expect_token (Tiger::ASSIG);
+    if (assig_tok == NULL){//var a :int:=
+        skip_after_semicolon ();
+        return Tree::error ();
+    }
+    estou aqui, criei parse type literal, nao sei se vai rolar
+    se nada der certo, fazer apenas var a := 1// e nao permitir var a :=(1+1+..+0.1);
+    nao estou conseguindo fazer retornar "type_tree.get_tree ()"
+    type_tree = parse_type_literal (); //var a :int
+    printf("\n Type int");
+
+    if (type_tree.is_error ()){
+      skip_after_semicolon();
+      return Tree::error ();
+    }    
+    first_of_expr = lexer.peek_token ();
+    expr = parse_expression ();
+    printf("\n EXP");
+    if (expr.is_error ())
+      return Tree::error ();
+    
+  }
+  //espera um ;
   skip_token (Tiger::SEMICOLON);
 
-  if (scope.get_current_mapping ().get (identifier->get_str ()))
-    {
+    printf("\n verifica declaracao scopo");
+  //verifica se já existe variavel declarada com este nome ;
+  if (scope.get_current_mapping ().get (identifier->get_str ())){
       error_at (identifier->get_locus (),
-		  "name '%s' already declared in this scope",
-		  identifier->get_str ().c_str ());
-    }
+          		  "name '%s' already declared in this scope",
+		            identifier->get_str ().c_str ());
+  }
+  //cria e insere simbolo
+  printf("\n cria symbol");
   SymbolPtr sym (new Symbol (Tiger::VARIABLE, identifier->get_str ()));
   scope.get_current_mapping ().insert (sym);
+
+  //cria arvore de declaracao(localizacao, var_decl, nome ident, tipo)
+  printf("\n build dcl");
 
   Tree decl = build_decl (identifier->get_locus (),
                           VAR_DECL,
 			                    get_identifier (sym->get_name ().c_str ()),
 			                    type_tree.get_tree ());
   DECL_CONTEXT (decl.get_tree()) = main_fndecl;
+  printf("\n assert");
 
   gcc_assert (!stack_var_decl_chain.empty ());
   stack_var_decl_chain.back ().append (decl);
 
   sym->set_tree_decl (decl);
+  
+  if (decl.get_type () != expr.get_type ()){
+      error_at (first_of_expr->get_locus (),
+                "cannot assign value of type %s to variable '%s' of type %s",
+                print_type (expr.get_type ()), sym->get_name ().c_str (),
+                print_type (decl.get_type ()));
+      return Tree::error ();
+ }
 
-  Tree stmt
-    = build_tree (DECL_EXPR, identifier->get_locus (), void_type_node, decl);
+  Tree stmt = build_tree (DECL_EXPR, identifier->get_locus (), void_type_node, decl);
 
-  return stmt;
+  /*nao estava dando, sive que recuperar o simbolo novamente*/
+  sym = query_variable (identifier->get_str (), identifier->get_locus ());
+  gcc_assert (!sym->get_tree_decl ().is_null ());
+  Tree var_decl = sym->get_tree_decl ();
+  Tree assig_expr = build_tree (MODIFY_EXPR, assig_tok->get_locus (), void_type_node, var_decl, expr);
+  return assig_expr;
 }
+
+
 
 Tree
 Parser::parse_type_declaration ()
@@ -585,8 +676,7 @@ Parser::parse_type_declaration ()
 
   sym->set_tree_decl (decl);
 
-  Tree stmt
-    = build_tree (DECL_EXPR, identifier->get_locus (), void_type_node, decl);
+  Tree stmt= build_tree (DECL_EXPR, identifier->get_locus (), void_type_node, decl);
 
   return stmt;
 }
@@ -598,8 +688,7 @@ bool
 is_string_type (Tree type)
 {
   gcc_assert (TYPE_P (type.get_tree ()));
-  return type.get_tree_code () == POINTER_TYPE
-	 && TYPE_MAIN_VARIANT (TREE_TYPE (type.get_tree ())) == char_type_node;
+  return type.get_tree_code () == POINTER_TYPE && TYPE_MAIN_VARIANT (TREE_TYPE (type.get_tree ())) == char_type_node;
 }
 
 bool
@@ -730,7 +819,21 @@ Parser::parse_record ()
 
   return record_type;
 }
-
+Tree
+Parser::parse_type_literal ()
+{
+Tree type;
+switch (t->get_id ())
+  {
+  case Tiger::INTEGER_LITERAL:
+      lexer.skip_token ();
+      type = integer_type_node;
+      break;
+    case Tiger::FLOAT_LITERAL:
+      lexer.skip_token ();
+      type = float_type_node;
+      break;
+}
 Tree
 Parser::parse_type ()
 {
@@ -745,7 +848,6 @@ Parser::parse_type ()
   const_TokenPtr t = lexer.peek_token ();
 
   Tree type;
-
   switch (t->get_id ())
     {
     case Tiger::INT:
@@ -762,12 +864,12 @@ Parser::parse_type ()
       break;
     case Tiger::IDENTIFIER:
       {
-	SymbolPtr s = query_type (t->get_str (), t->get_locus ());
+  	    SymbolPtr s = query_type (t->get_str (), t->get_locus ());
         lexer.skip_token ();
-	if (s == NULL)
-	  type = Tree::error ();
+	      if (s == NULL)
+	         type = Tree::error ();
         else
-          type = TREE_TYPE (s->get_tree_decl ().get_tree ());
+           type = TREE_TYPE (s->get_tree_decl ().get_tree ());
       }
       break;
     case Tiger::RECORD:
@@ -783,65 +885,46 @@ Parser::parse_type ()
   Dimensions dimensions;
 
   t = lexer.peek_token ();
-  while (t->get_id () == Tiger::LEFT_PAREN || t->get_id () == Tiger::LEFT_SQUARE)
-    {
+  while (t->get_id () == Tiger::LEFT_PAREN || t->get_id () == Tiger::LEFT_SQUARE){
       lexer.skip_token ();
 
       Tree lower_bound, upper_bound;
-      if (t->get_id () == Tiger::LEFT_SQUARE)
-	{
-	  Tree size = parse_integer_expression ();
-	  skip_token (Tiger::RIGHT_SQUARE);
+      if (t->get_id () == Tiger::LEFT_SQUARE){
+    	  Tree size = parse_integer_expression ();
+    	  skip_token (Tiger::RIGHT_SQUARE);
 
-	  lower_bound = Tree (build_int_cst_type (integer_type_node, 0),
-			      size.get_locus ());
-	  upper_bound
-	    = build_tree (MINUS_EXPR, size.get_locus (), integer_type_node,
-			  size, build_int_cst (integer_type_node, 1));
+    	  lower_bound = Tree (build_int_cst_type (integer_type_node, 0),
+    			                  size.get_locus ());
+    	  upper_bound = build_tree (MINUS_EXPR, size.get_locus (), 
+                                  integer_type_node,
+    			                        size, 
+                                  build_int_cst (integer_type_node, 1));
 
-	}
-      else if (t->get_id () == Tiger::LEFT_PAREN)
-	{
-	  lower_bound = parse_integer_expression ();
-	  skip_token (Tiger::COLON);
+    	}else if (t->get_id () == Tiger::LEFT_PAREN){
+    	  lower_bound = parse_integer_expression ();
+    	  skip_token (Tiger::COLON);
 
-	  upper_bound = parse_integer_expression ();
-	  skip_token (Tiger::RIGHT_PAREN);
-	}
-      else
-	{
-	  gcc_unreachable ();
-	}
+    	  upper_bound = parse_integer_expression ();
+    	  skip_token (Tiger::RIGHT_PAREN);
+    	}else{
+    	  gcc_unreachable ();
+    	}
 
       dimensions.push_back (std::make_pair (lower_bound, upper_bound));
       t = lexer.peek_token ();
-    }
+  }
 
-  for (Dimensions::reverse_iterator it = dimensions.rbegin ();
-       it != dimensions.rend (); it++)
-    {
+  for (Dimensions::reverse_iterator it = dimensions.rbegin ();it != dimensions.rend (); it++) {
       it->first = Tree (fold (it->first.get_tree ()), it->first.get_locus ());
-//       if (it->first.get_tree_code () != INTEGER_CST)
-// 	{
-// 	  error_at (it->first.get_locus (), "is not an integer constant");
-// 	  break;
-// 	}
-      it->second
-	= Tree (fold (it->second.get_tree ()), it->second.get_locus ());
-//       if (it->second.get_tree_code () != INTEGER_CST)
-// 	{
-// 	  error_at (it->second.get_locus (), "is not an integer constant");
-// 	  break;
-// 	}
+      it->second = Tree (fold (it->second.get_tree ()), it->second.get_locus ());
 
-      if (!type.is_error ())
-	{
-	  Tree range_type
-	    = build_range_type (integer_type_node, it->first.get_tree (),
-				it->second.get_tree ());
-	  type = build_array_type (type.get_tree (), range_type.get_tree ());
-	}
-    }
+    if (!type.is_error ()){
+  	  Tree range_type = build_range_type (integer_type_node, 
+                                          it->first.get_tree (),
+  				                                it->second.get_tree ());
+  	  type = build_array_type (type.get_tree (), range_type.get_tree ());
+	   }
+  }
 
   return type;
 }
@@ -901,14 +984,13 @@ Parser::query_integer_variable (const std::string &name, location_t loc)
 }
 
 Tree
-Parser::parse_assignment_statement ()
-{
-  // assignment_statement -> expression ":=" expression ";"
+Parser::parse_assignment_statement (){
+    // assignment_statement -> expression ":=" expression ";"
   Tree variable = parse_lhs_assignment_expression ();
-
+  //verifica se retorno possui erros
   if (variable.is_error ())
     return Tree::error ();
-
+  //verifica se tkn = ":="
   const_TokenPtr assig_tok = expect_token (Tiger::ASSIG);
   if (assig_tok == NULL)
     {
@@ -1002,6 +1084,7 @@ Parser::build_if_statement (Tree bool_expr, Tree then_part, Tree else_part)
     }
 
   // FIXME - location
+  // FIXED :D
   Tree endif_label_expr = build_tree (LABEL_EXPR, UNKNOWN_LOCATION,
 				      void_type_node, endif_label_decl);
   stmt_list.append (endif_label_expr);
@@ -1397,24 +1480,19 @@ Parser::parse_write_statement ()
   if (expr.is_error ())
     return Tree::error ();
 
-  if (expr.get_type () == integer_type_node)
-    {
+  if (expr.get_type () == integer_type_node){
       // printf("%d\n", expr)
       const char *format_integer = "%d\n";
-      tree args[]
-	= {build_string_literal (strlen (format_integer) + 1, format_integer),
+      tree args[]= {build_string_literal (strlen (format_integer) + 1, format_integer),
 	   expr.get_tree ()};
 
       Tree printf_fn = get_printf_addr ();
 
-      tree stmt
-	= build_call_array_loc (first_of_expr->get_locus (), integer_type_node,
-				printf_fn.get_tree (), 2, args);
+      tree stmt = build_call_array_loc (first_of_expr->get_locus (), integer_type_node,
+			printf_fn.get_tree (), 2, args);
 
       return stmt;
-    }
-  else if (expr.get_type () == float_type_node)
-    {
+  }else if (expr.get_type () == float_type_node){
       // printf("%f\n", (double)expr)
       const char *format_float = "%f\n";
       tree args[]
@@ -1474,7 +1552,8 @@ advancing the current token, more on this later). Once we are back from the
 left denotation we will check again if the current token has a higher left 
 binding power than the current right binding power and proceed likewise.
 
-Ok, I tried, but the explanation above is rather dense. Behold the stunning simplicity of this parser at its core.
+Ok, I tried, but the explanation above is rather dense. Behold the stunning 
+simplicity of this parser at its core.
 */
 // This is a Pratt parser
 Tree
@@ -1609,6 +1688,15 @@ stream but the previous one since parse_expression already skipped tok before ca
 Tree
 Parser::null_denotation (const_TokenPtr tok)
 {
+/*
+Note that using Tree rather than the GENERIC tree is essential for primaries. 
+In the code above s->get_tree_decl() returns a tree with the location of the 
+variable declaration. We could use this tree but for diagnostics purposes we 
+want the location where the variable is being referenced.
+
+For literals, the literal itself encodes the value. So the text of the token 
+will have to be interpreted as the appropiate value. For integers we can just use atoi.
+*/
   switch (tok->get_id ()){
     case Tiger::IDENTIFIER:{
 	     SymbolPtr s = query_variable (tok->get_str (), tok->get_locus ());
@@ -1622,6 +1710,12 @@ Parser::null_denotation (const_TokenPtr tok)
 				           atoi (tok->get_str ().c_str ())),
 		               tok->get_locus ());
       break;
+      /*
+For a real literal we have to invoke the (GCC-provided) function real_from_string3 (line 27) 
+to get a real value representation from a string. This function expects the machine (i.e. architecture dependent)
+mode of the type, that we can obtain using TYPE_MODE. It returns its value in a REAL_VALUE_TYPE that then can 
+be used to build a real constant tree using the (GCC-provided) function build_real.
+      */
     case Tiger::REAL_LITERAL: {
 	     REAL_VALUE_TYPE real_value;
 	     real_from_string3 (&real_value,
@@ -1632,6 +1726,18 @@ Parser::null_denotation (const_TokenPtr tok)
 		                tok->get_locus ());
       }
       break;
+      /*
+To create a string literal we use the (GCC-provided) function build_string_literal. 
+For practical reasons our string literal will contain the NULL terminator, otherwise 
+the string literal itself will not be useable in C functions (more on this later).
+
+While the type GENERIC trees created for integer and real literals was obviously 
+integer_type_node and float_type_node, it is not so clear for string literals. 
+The tree created by build_string_literal has type pointer to a character type. 
+Pointer types have a tree code of POINTER_TYPE and the pointee type is found in TREE_TYPE.
+Sometimes we will need to check if an expression has the type of a string literal, 
+so we will use the following auxiliar function.
+      */
     case Tiger::STRING_LITERAL:
       {
 	std::string str = tok->get_str ();
