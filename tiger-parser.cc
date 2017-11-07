@@ -552,14 +552,15 @@ Parser::parse_variable_declaration (){
       return Tree::error ();
 
   }else{
+    error_at (identifier->get_locus (),
+                "definicao de variavel sem tipo nao implementada",
+                identifier->get_str ().c_str ());
+    return Tree::error ();
     assig_tok = expect_token (Tiger::ASSIG);
     if (assig_tok == NULL){//var a :int:=
         skip_after_semicolon ();
         return Tree::error ();
     }
-    estou aqui, criei parse type literal, nao sei se vai rolar
-    se nada der certo, fazer apenas var a := 1// e nao permitir var a :=(1+1+..+0.1);
-    nao estou conseguindo fazer retornar "type_tree.get_tree ()"
     type_tree = parse_type_literal (); //var a :int
     printf("\n Type int");
 

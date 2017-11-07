@@ -1,5 +1,6 @@
 # bubble.tiger
 var n : int;
+var n : int:=10;
 write "Enter the number of integers:";
 read n;
  
