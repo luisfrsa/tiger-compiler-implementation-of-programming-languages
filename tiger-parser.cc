@@ -561,7 +561,7 @@ Parser::parse_variable_declaration (){
         skip_after_semicolon ();
         return Tree::error ();
     }
-    type_tree = parse_type_literal (); //var a :int
+   // type_tree = parse_type_literal (); //var a :int
     printf("\n Type int");
 
     if (type_tree.is_error ()){
