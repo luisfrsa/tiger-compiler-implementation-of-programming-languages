@@ -101,6 +101,7 @@ private:
   SymbolPtr query_integer_variable (const std::string &name, location_t loc);
 
   void parse_statement_seq (bool (Parser::*done) ());
+  void parse_declaration_seq (bool (Parser::*done) ());
 
   bool done_end ();
   bool done_end_or_else ();
@@ -163,7 +164,9 @@ public:
   Tree parse_lhs_assignment_expression();
   Tree parse_boolean_expression ();
   Tree parse_integer_expression ();
-
+  /*Tiger*/
+  Tree parse_let_statment();
+  /*Tiger*/
 private:
   Lexer &lexer;
   Scope scope;
@@ -457,6 +460,11 @@ Parser::parse_statement ()
     case Tiger::IDENTIFIER:
       return parse_assignment_statement ();
       break;
+     /*Tiger*/
+     case Tiger::LET:
+      return parse_let_statment ();
+      break;
+      
     default:
       unexpected_token (t);
       skip_after_semicolon ();
@@ -1271,6 +1279,63 @@ Parser::build_for_statement (SymbolPtr ind_var, Tree lower_bound,
   return stmt_list.get_tree ();
 }
 
+Tree Parse::parse_let_statment(){
+  estou aqui
+  iniciei o Let
+  statment = declaracao, no tiny pode funcionar
+  mas no tigerl ele diferencia declaracao e expressao
+  
+ if (!skip_token (Tiger::LET))
+    {
+      skip_after_end ();
+      return Tree::error ();
+  }
+
+  const_TokenPtr t = lexer.peek_token ();
+
+  switch (t->get_id ())
+    {
+    case Tiger::VAR:
+      return parse_variable_declaration ();
+      break;
+    case Tiger::TYPE:
+      return parse_type_declaration ();
+      break;
+    default:
+      unexpected_token (t);
+      skip_after_semicolon ();
+      return Tree::error ();
+      break;
+    }
+
+  gcc_unreachable ();
+
+  enter_scope ();
+  if (!skip_token (Tiger::IN))
+  {
+     skip_after_end ();
+     return Tree::error ();
+  }
+  enter_scope ();
+  parse_statement_seq (&Parser::done_end);
+
+  TreeSymbolMapping for_body_tree_scope = leave_scope ();
+  Tree for_body_stmt = for_body_tree_scope.bind_expr;
+
+  skip_token (Tiger::END);
+
+
+   enter_scope ();
+  parse_statement_seq (&Parser::done_end);
+  TreeSymbolMapping while_body_tree_scope = leave_scope ();
+
+  Tree while_body_stmt = while_body_tree_scope.bind_expr;
+
+  skip_token (Tiger::END);
+
+  return build_while_statement (expr, while_body_stmt);
+
+}
 Tree
 Parser::parse_for_statement ()
 {
