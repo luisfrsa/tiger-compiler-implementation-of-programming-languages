@@ -561,7 +561,7 @@ Parser::parse_variable_declaration (){
         skip_after_semicolon ();
         return Tree::error ();
     }
-   // type_tree = parse_type_literal (); //var a :int
+   /*
     printf("\n Type int");
 
     if (type_tree.is_error ()){
@@ -573,7 +573,7 @@ Parser::parse_variable_declaration (){
     printf("\n EXP");
     if (expr.is_error ())
       return Tree::error ();
-    
+    */
   }
   //espera um ;
   skip_token (Tiger::SEMICOLON);
@@ -820,21 +820,7 @@ Parser::parse_record ()
 
   return record_type;
 }
-Tree
-Parser::parse_type_literal ()
-{
-Tree type;
-switch (t->get_id ())
-  {
-  case Tiger::INTEGER_LITERAL:
-      lexer.skip_token ();
-      type = integer_type_node;
-      break;
-    case Tiger::FLOAT_LITERAL:
-      lexer.skip_token ();
-      type = float_type_node;
-      break;
-}
+
 Tree
 Parser::parse_type ()
 {
