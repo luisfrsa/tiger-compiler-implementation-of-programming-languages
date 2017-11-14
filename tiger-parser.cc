@@ -101,7 +101,6 @@ private:
   SymbolPtr query_integer_variable (const std::string &name, location_t loc);
 
   void parse_statement_seq (bool (Parser::*done) ());
-  void parse_declaration_seq (bool (Parser::*done) ());
 
   bool done_end ();
   bool done_end_or_else ();
@@ -109,6 +108,14 @@ private:
 
   typedef Tree (Parser::*BinaryHandler) (const_TokenPtr, Tree);
   BinaryHandler get_binary_handler (TokenId id);
+
+   /*Tiger*/
+  void parse_let_declaration_seq (bool (Parser::*done) ());
+  bool done_in ();
+  Tree parse_let_statment();
+  Tree parse_declaration_let();
+
+  /*Tiger*/
 
 #define BINARY_HANDLER_LIST                                                    \
   BINARY_HANDLER (plus, PLUS)                                                  \
@@ -164,9 +171,7 @@ public:
   Tree parse_lhs_assignment_expression();
   Tree parse_boolean_expression ();
   Tree parse_integer_expression ();
-  /*Tiger*/
-  Tree parse_let_statment();
-  /*Tiger*/
+
 private:
   Lexer &lexer;
   Scope scope;
@@ -327,9 +332,17 @@ bool
 Parser::done_end_or_else ()
 {
   const_TokenPtr t = lexer.peek_token ();
-  return (t->get_id () == Tiger::END || t->get_id () == Tiger::ELSE
-	  || t->get_id () == Tiger::END_OF_FILE);
+  return (t->get_id () == Tiger::END || t->get_id () == Tiger::ELSE || t->get_id () == Tiger::END_OF_FILE);
 }
+/*Tiger*/
+bool
+Parser::done_in ()
+{
+  const_TokenPtr t = lexer.peek_token ();
+  return (t->get_id () == Tiger::IN || t->get_id () == Tiger::END_OF_FILE);
+}
+/*Tiger*/
+
 /*
 ===(1)===
 This is fine but if you check the syntax of tiny, you will see that the condition 
@@ -350,7 +363,16 @@ Parser::parse_statement_seq (bool (Parser::*done) ())
       get_current_stmt_list ().append (stmt);
     }
 }
-
+void
+Parser::parse_let_declaration_seq (bool (Parser::*done) ())
+{
+  // Parse statements until done and append to the current stmt list;
+  while (!(this->*done) ())
+    {
+      Tree stmt = parse_declaration_let ();
+      get_current_stmt_list ().append (stmt);
+    }
+}
 void
 Parser::enter_scope ()
 {
@@ -436,12 +458,13 @@ Parser::parse_statement ()
 
   switch (t->get_id ())
     {
-    case Tiger::VAR:
+   /* case Tiger::VAR:
       return parse_variable_declaration ();
       break;
     case Tiger::TYPE:
       return parse_type_declaration ();
       break;
+      */
     case Tiger::IF:
       return parse_if_statement ();
       break;
@@ -460,11 +483,11 @@ Parser::parse_statement ()
     case Tiger::IDENTIFIER:
       return parse_assignment_statement ();
       break;
-     /*Tiger*/
-     case Tiger::LET:
+    /*Tiger*/
+    case Tiger::LET:
       return parse_let_statment ();
       break;
-      
+    /*Tiger*/
     default:
       unexpected_token (t);
       skip_after_semicolon ();
@@ -480,6 +503,28 @@ Parser::parse_statement ()
     }
 
   gcc_unreachable ();
+}
+Tree
+Parser::parse_declaration_let ()
+{
+ const_TokenPtr t = lexer.peek_token ();
+ switch (t->get_id ())
+    {
+    case Tiger::VAR:
+      return parse_variable_declaration ();
+      break;
+    case Tiger::TYPE:
+      return parse_type_declaration ();
+      break;
+    case Tiger::FUNCTION:
+      /*return parse_type_declaration ();*/
+      break;
+    default:
+      unexpected_token (t);
+      skip_after_semicolon ();
+      return Tree::error ();
+      break;
+    }
 }
 /*
 We first parse the syntactic elements of a variable declaration. We skip the initial var in lines 4 to 8. 
@@ -560,16 +605,16 @@ Parser::parse_variable_declaration (){
       return Tree::error ();
 
   }else{
-    error_at (identifier->get_locus (),
-                "definicao de variavel sem tipo nao implementada",
-                identifier->get_str ().c_str ());
-    return Tree::error ();
     assig_tok = expect_token (Tiger::ASSIG);
     if (assig_tok == NULL){//var a :int:=
         skip_after_semicolon ();
         return Tree::error ();
     }
-   /*
+   /* estou aqui, criei parse type literal, nao sei se vai rolar
+    se nada der certo, fazer apenas var a := 1// e nao permitir var a :=(1+1+..+0.1);
+    nao estou conseguindo fazer retornar "type_tree.get_tree ()"
+    */
+    //type_tree = parse_type_literal (); //var a :int
     printf("\n Type int");
 
     if (type_tree.is_error ()){
@@ -581,7 +626,7 @@ Parser::parse_variable_declaration (){
     printf("\n EXP");
     if (expr.is_error ())
       return Tree::error ();
-    */
+    
   }
   //espera um ;
   skip_token (Tiger::SEMICOLON);
@@ -828,7 +873,23 @@ Parser::parse_record ()
 
   return record_type;
 }
-
+/*Tree
+Parser::parse_type_literal ()
+{
+  Tree type;
+  switch (t->get_id ())
+    {
+    case Tiger::INTEGER_LITERAL:
+        lexer.skip_token ();
+        type = integer_type_node;
+        break;
+      case Tiger::FLOAT_LITERAL:
+        lexer.skip_token ();
+        type = float_type_node;
+        break;
+  }
+}
+*/
 Tree
 Parser::parse_type ()
 {
@@ -1202,6 +1263,100 @@ Parser::build_while_statement (Tree bool_expr, Tree while_body)
 
   return stmt_list.get_tree ();
 }
+/*
+void nothing_if(){
+   if (!skip_token (Tiger::IF))
+    {
+      skip_after_end ();
+      return Tree::error ();
+    }
+
+  Tree expr = parse_boolean_expression ();
+
+  skip_token (Tiger::THEN);
+
+  enter_scope ();
+  parse_statement_seq (&Parser::done_end_or_else);
+
+  TreeSymbolMapping then_tree_scope = leave_scope ();
+  Tree then_stmt = then_tree_scope.bind_expr;
+
+  Tree else_stmt;
+  const_TokenPtr tok = lexer.peek_token ();
+  if (tok->get_id () == Tiger::ELSE)
+    {
+      // Consume 'else'
+      skip_token (Tiger::ELSE);
+
+      enter_scope ();
+      parse_statement_seq (&Parser::done_end);
+      TreeSymbolMapping else_tree_scope = leave_scope ();
+      else_stmt = else_tree_scope.bind_expr;
+
+      // Consume 'end'
+      skip_token (Tiger::END);
+    }
+  else if (tok->get_id () == Tiger::END)
+    {
+      // Consume 'end'
+      skip_token (Tiger::END);
+    }
+  else
+    {
+      unexpected_token (tok);
+      return Tree::error ();
+    }
+
+  return build_if_statement (expr, then_stmt, else_stmt);
+}
+*/
+Tree
+Parser::parse_let_statment(){
+
+  if (!skip_token (Tiger::LET))
+    { 
+      skip_after_end ();
+      return Tree::error ();
+    }
+  //enter_scope ();
+  parse_let_declaration_seq (&Parser::done_in);
+  //Tree decl = parse_let_declaration_seq ();
+
+  enter_scope ();//talvez tenha que compartilhar scope, ou talvez nao...
+  parse_let_declaration_seq (&Parser::done_in);
+
+  TreeSymbolMapping let_tree_scope = leave_scope ();
+  Tree let_stmt = let_tree_scope.bind_expr;
+
+  Tree in_stmt;
+  const_TokenPtr tok = lexer.peek_token ();
+  if (tok->get_id () == Tiger::IN)
+    {
+      skip_token (Tiger::IN);
+      enter_scope ();
+      parse_statement_seq (&Parser::end);
+      TreeSymbolMapping in_tree_scope = leave_scope ();
+      in_stmt = in_tree_scope.bind_expr;
+
+    }
+      skip_token (Tiger::END);
+
+  skip_token (Tiger::END);
+
+  TreeStmtList stmt_list;
+
+/*  Tree cond_expr
+    = build_tree (COND_EXPR, bool_expr.get_locus (), void_type_node, bool_expr,
+      goto_then, goto_else_or_endif);
+      */
+  stmt_list.append (let_stmt);
+  stmt_list.append (in_stmt); 
+
+  return stmt_list.get_tree();
+
+  //return build_if_statement (expr, let_stmt, int_stmt);
+  //return build_while_statement (expr, let_body_stmt);
+}
 
 Tree
 Parser::parse_while_statement ()
@@ -1279,63 +1434,6 @@ Parser::build_for_statement (SymbolPtr ind_var, Tree lower_bound,
   return stmt_list.get_tree ();
 }
 
-Tree Parse::parse_let_statment(){
-  estou aqui
-  iniciei o Let
-  statment = declaracao, no tiny pode funcionar
-  mas no tigerl ele diferencia declaracao e expressao
-  
- if (!skip_token (Tiger::LET))
-    {
-      skip_after_end ();
-      return Tree::error ();
-  }
-
-  const_TokenPtr t = lexer.peek_token ();
-
-  switch (t->get_id ())
-    {
-    case Tiger::VAR:
-      return parse_variable_declaration ();
-      break;
-    case Tiger::TYPE:
-      return parse_type_declaration ();
-      break;
-    default:
-      unexpected_token (t);
-      skip_after_semicolon ();
-      return Tree::error ();
-      break;
-    }
-
-  gcc_unreachable ();
-
-  enter_scope ();
-  if (!skip_token (Tiger::IN))
-  {
-     skip_after_end ();
-     return Tree::error ();
-  }
-  enter_scope ();
-  parse_statement_seq (&Parser::done_end);
-
-  TreeSymbolMapping for_body_tree_scope = leave_scope ();
-  Tree for_body_stmt = for_body_tree_scope.bind_expr;
-
-  skip_token (Tiger::END);
-
-
-   enter_scope ();
-  parse_statement_seq (&Parser::done_end);
-  TreeSymbolMapping while_body_tree_scope = leave_scope ();
-
-  Tree while_body_stmt = while_body_tree_scope.bind_expr;
-
-  skip_token (Tiger::END);
-
-  return build_while_statement (expr, while_body_stmt);
-
-}
 Tree
 Parser::parse_for_statement ()
 {

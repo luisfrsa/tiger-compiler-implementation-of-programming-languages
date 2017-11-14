@@ -1,0 +1,9 @@
+let
+	var a:int:=(5-2);
+	var b:float:=1.5;
+in
+	var a:int:=(5-2);
+	write a;
+	a:=5;
+	write a;
+end
