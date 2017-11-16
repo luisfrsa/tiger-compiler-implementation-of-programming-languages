@@ -112,8 +112,14 @@ private:
    /*Tiger*/
   void parse_let_declaration_seq (bool (Parser::*done) ());
   bool done_in ();
-  Tree parse_let_statment();
+  Tree parse_let_statement();
+  Tree parse_literal_statement();
   Tree parse_declaration_let();
+  
+  Tree last_expr;
+
+  Tree getLastExp();
+  void setLastExp(Tree exp);
 
   /*Tiger*/
 
@@ -373,6 +379,12 @@ Parser::parse_let_declaration_seq (bool (Parser::*done) ())
       get_current_stmt_list ().append (stmt);
     }
 }
+Tree Parser::getLastExp(){
+  return this->last_expr;
+}
+void Parser::setLastExp(Tree expr){
+  this->last_expr = expr; 
+}
 void
 Parser::enter_scope ()
 {
@@ -485,7 +497,16 @@ Parser::parse_statement ()
       break;
     /*Tiger*/
     case Tiger::LET:
-      return parse_let_statment ();
+      return parse_let_statement ();
+      break;
+      /*
+  assignment e literal devem retornar valores
+      */
+    case Tiger::INTEGER_LITERAL:
+    case Tiger::STRING_LITERAL:
+    case Tiger::FLOAT_LITERAL:
+    case Tiger::LEFT_PAREN:
+      return Parser::parse_literal_statement ();
       break;
     /*Tiger*/
     default:
@@ -525,6 +546,8 @@ Parser::parse_declaration_let ()
       return Tree::error ();
       break;
     }
+  gcc_unreachable ();
+
 }
 /*
 We first parse the syntactic elements of a variable declaration. We skip the initial var in lines 4 to 8. 
@@ -666,7 +689,7 @@ Parser::parse_variable_declaration (){
       return Tree::error ();
  }
 
-  Tree stmt = build_tree (DECL_EXPR, identifier->get_locus (), void_type_node, decl);
+  //Tree stmt = build_tree (DECL_EXPR, identifier->get_locus (), void_type_node, decl);
 
   /*nao estava dando, sive que recuperar o simbolo novamente*/
   sym = query_variable (identifier->get_str (), identifier->get_locus ());
@@ -1056,7 +1079,9 @@ Parser::parse_assignment_statement (){
 
   const_TokenPtr first_of_expr = lexer.peek_token ();
 
+  //Tree expr = parse_expression (); OLD, VOU TENTAR COLOCAR EXP
   Tree expr = parse_expression ();
+
   if (expr.is_error ())
     return Tree::error ();
 
@@ -1263,55 +1288,20 @@ Parser::build_while_statement (Tree bool_expr, Tree while_body)
 
   return stmt_list.get_tree ();
 }
-/*
-void nothing_if(){
-   if (!skip_token (Tiger::IF))
-    {
-      skip_after_end ();
-      return Tree::error ();
-    }
 
-  Tree expr = parse_boolean_expression ();
-
-  skip_token (Tiger::THEN);
-
-  enter_scope ();
-  parse_statement_seq (&Parser::done_end_or_else);
-
-  TreeSymbolMapping then_tree_scope = leave_scope ();
-  Tree then_stmt = then_tree_scope.bind_expr;
-
-  Tree else_stmt;
-  const_TokenPtr tok = lexer.peek_token ();
-  if (tok->get_id () == Tiger::ELSE)
-    {
-      // Consume 'else'
-      skip_token (Tiger::ELSE);
-
-      enter_scope ();
-      parse_statement_seq (&Parser::done_end);
-      TreeSymbolMapping else_tree_scope = leave_scope ();
-      else_stmt = else_tree_scope.bind_expr;
-
-      // Consume 'end'
-      skip_token (Tiger::END);
-    }
-  else if (tok->get_id () == Tiger::END)
-    {
-      // Consume 'end'
-      skip_token (Tiger::END);
-    }
-  else
-    {
-      unexpected_token (tok);
-      return Tree::error ();
-    }
-
-  return build_if_statement (expr, then_stmt, else_stmt);
-}
-*/
 Tree
-Parser::parse_let_statment(){
+Parser::parse_literal_statement(){
+  Tree literal = parse_expression ();
+
+  TreeStmtList stmt_list;
+  stmt_list.append (literal);
+
+  return stmt_list.get_tree();
+
+}
+
+Tree
+Parser::parse_let_statement(){
 
   if (!skip_token (Tiger::LET))
     { 
@@ -1319,29 +1309,28 @@ Parser::parse_let_statment(){
       return Tree::error ();
     }
   //enter_scope ();
-  parse_let_declaration_seq (&Parser::done_in);
+  //parse_let_declaration_seq (&Parser::done_in);
   //Tree decl = parse_let_declaration_seq ();
 
-  enter_scope ();//talvez tenha que compartilhar scope, ou talvez nao...
+  enter_scope ();
   parse_let_declaration_seq (&Parser::done_in);
 
-  TreeSymbolMapping let_tree_scope = leave_scope ();
-  Tree let_stmt = let_tree_scope.bind_expr;
-
-  Tree in_stmt;
+  //Tree in_stmt;
   const_TokenPtr tok = lexer.peek_token ();
   if (tok->get_id () == Tiger::IN)
     {
       skip_token (Tiger::IN);
       enter_scope ();
       parse_statement_seq (&Parser::done_end);
-      TreeSymbolMapping in_tree_scope = leave_scope ();
+      /*TreeSymbolMapping in_tree_scope = leave_scope ();
       in_stmt = in_tree_scope.bind_expr;
-
+      */
     }
-      skip_token (Tiger::END);
 
   skip_token (Tiger::END);
+
+  TreeSymbolMapping let_tree_scope = leave_scope ();
+  Tree let_stmt = let_tree_scope.bind_expr;
 
   TreeStmtList stmt_list;
 
@@ -1350,7 +1339,7 @@ Parser::parse_let_statment(){
       goto_then, goto_else_or_endif);
       */
   stmt_list.append (let_stmt);
-  stmt_list.append (in_stmt); 
+  //stmt_list.append (in_stmt); 
 
   return stmt_list.get_tree();
 
@@ -1717,15 +1706,14 @@ Parser::parse_expression (int right_binding_power)
   if (expr.is_error ())
     return Tree::error ();
 
-  while (right_binding_power < left_binding_power (lexer.peek_token ()))
-    {
+  while (right_binding_power < left_binding_power (lexer.peek_token ())){
       current_token = lexer.peek_token();
       lexer.skip_token ();
 
       expr = left_denotation (current_token, expr);
       if (expr.is_error ())
-	return Tree::error ();
-    }
+	     return Tree::error ();
+  }
 
   return expr;
 }

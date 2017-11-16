@@ -20,6 +20,7 @@ TESTES
 COMPILACAO
 ../gcc-install/bin/gcctiger -o record2.tg ../gcc-src/gcc/tiger/my_folder/tests_tiny/record2.tiny
 ../gcc-install/bin/gcctiger -o test ../gcc-src/gcc/tiger/my_folder/tests_tiny/test.tiger
+../gcc-install/bin/gcctiger -o let ../gcc-src/gcc/tiger/my_folder/tests_tiny/let.tiger
 
 
 ip: 10.30.11.19

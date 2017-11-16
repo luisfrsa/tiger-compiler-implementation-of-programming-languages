@@ -2,8 +2,10 @@ let
 	var a:int:=(5-2);
 	var b:float:=1.5;
 in
-	var a:int:=(5-2);
 	write a;
+	write b;
 	a:=5;
+	b:=b+a;
 	write a;
+	write b;
 end
