@@ -295,9 +295,9 @@ Parser::parse_program ()
   DECL_CONTEXT (resdecl) = main_fndecl;
   DECL_RESULT (main_fndecl) = resdecl;
   tree set_result
-    = build2 (INIT_EXPR, void_type_node, DECL_RESULT (main_fndecl),
+    = build2 (INIT_EXPR, integer_type_node, DECL_RESULT (main_fndecl),
 	      build_int_cst_type (integer_type_node, 0));
-  tree return_stmt = build1 (RETURN_EXPR, void_type_node, set_result);
+  tree return_stmt = build1 (RETURN_EXPR, integer_type_node, set_result);
 
   get_current_stmt_list ().append (return_stmt);
 
@@ -1056,8 +1056,6 @@ Parser::parse_assignment_statement (){
 
   Tree expr = parse_expression ();
 
-  printf("parse_assignment_statement IF?   %s \n ",print_type (expr.get_type ()));
-
   if (expr.is_error ())
     return Tree::error ();
 
@@ -1388,7 +1386,7 @@ Parser::build_for_statement (SymbolPtr ind_var, Tree lower_bound,
   // ind_var := ind_var + 1
   Tree incr_ind_var = build_tree (MODIFY_EXPR, /* FIXME */ UNKNOWN_LOCATION, void_type_node,ind_var_decl,
 		                              build_tree (PLUS_EXPR, UNKNOWN_LOCATION, integer_type_node,ind_var_decl,
-			                                        build_int_cst_type (::integer_type_node, 1)));
+			                                         build_int_cst_type (::integer_type_node, 1)));
 
   // Wrap as a stmt list
   TreeStmtList for_stmt_list = for_body_stmt_list;
@@ -1885,10 +1883,7 @@ so we will use the following auxiliar function.
     }
     //Tiger
     case Tiger::IF:{
-        Tree exp_if = Tree (parse_if_statement (1),tok->get_locus ()); 
-        printf("EXP IF TIPO   %s \n ",print_type (exp_if.get_type ()));
-       return exp_if;
-       //return Tree (parse_if_statement (1),tok->get_locus ());
+       return Tree (parse_if_statement (1),tok->get_locus ());
     }
     //Tiger
     default:

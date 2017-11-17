@@ -21,6 +21,8 @@ COMPILACAO
 ../gcc-install/bin/gcctiger -o record2.tg ../gcc-src/gcc/tiger/my_folder/tests_tiny/record2.tiny
 ../gcc-install/bin/gcctiger -o test ../gcc-src/gcc/tiger/my_folder/tests_tiny/test.tiger
 ../gcc-install/bin/gcctiger -o let ../gcc-src/gcc/tiger/my_folder/tests_tiny/let.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/tests_tiny/if.tiger
+../gcc-install/bin/gcctiger -o min ../gcc-src/gcc/tiger/my_folder/tests_tiny/test_min.tiger
 
 
 ip: 10.30.11.19
@@ -33,5 +35,5 @@ http://www.cs.tufts.edu/comp/181/tiger.html
 
 ===(1)===
 
-tiny2tiger
+https://gcc.gnu.org/wiki/GenericAPI
 

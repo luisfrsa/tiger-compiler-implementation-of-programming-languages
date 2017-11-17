@@ -1,0 +1,36 @@
+
+let 
+	var a:int:=3;
+	var b:float:=1.1;
+in
+	a:=1;
+	if 3>2
+	then
+		write "IF then A";
+		b:=2.2;
+		a:=1;
+		b:=2.2;
+		a:=1;
+		a:=1;
+	end
+	if 1>2
+	then
+		write "IF then B";
+		a:=1;
+		b:=2.2;
+		a:=333;
+	else
+		write "IF else B";
+		a:=333;
+		b:=2.2;
+		a:=333;
+	end
+
+
+
+	
+	write a;
+	write b;
+
+	
+end

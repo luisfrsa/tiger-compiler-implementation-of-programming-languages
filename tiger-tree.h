@@ -122,7 +122,7 @@ public:
   {
     return Tree (error_mark_node);
   }
-
+  
   Tree
   get_type () const
   {
@@ -168,8 +168,7 @@ build_tree (tree_code tc, location_t loc, Tree type, Tree t1, Tree t2, Tree t3,
 }
 
 inline Tree
-build_tree (tree_code tc, location_t loc, Tree type, Tree t1, Tree t2, Tree t3,
-	    Tree t4, Tree t5)
+build_tree (tree_code tc, location_t loc, Tree type, Tree t1, Tree t2, Tree t3,	    Tree t4, Tree t5)
 {
   return build5_loc (loc, tc, type.get_tree (), t1.get_tree (), t2.get_tree (),
 		     t3.get_tree (), t4.get_tree (), t5.get_tree ());
@@ -181,20 +180,27 @@ struct TreeStmtList
 public:
   TreeStmtList () : list (alloc_stmt_list ()) {}
   TreeStmtList (Tree t) : list (t.get_tree ()) {}
-
   void
   append (Tree t)
   {
     append_to_statement_list (t.get_tree (), &list);
   }
-
-  tree
-  get_tree () const
+ 
+  tree get_tree () const
   {
     return list;
   }
+  void set_tipo(Tree t){
+    tipo = t;
+  }
+  Tree get_tipo ()
+  {
+    return tipo;
+  }
 
 private:
+  Tree tipo;
+
   tree list;
 };
 
@@ -207,18 +213,14 @@ template <typename Append> struct TreeChainBase
   TreeChainBase () : first (), last () {}
 
   void
-  append (Tree t)
-  {
+  append (Tree t){
     gcc_assert (!t.is_null());
-    if (first.is_null())
-      {
-	first = last = t;
-      }
-    else
-      {
-	Append () (last, t);
-	last = t;
-      }
+    if (first.is_null()){
+	     first = last = t;
+    }else{
+	     Append () (last, t);
+	     last = t;
+    }
   }
 };
 

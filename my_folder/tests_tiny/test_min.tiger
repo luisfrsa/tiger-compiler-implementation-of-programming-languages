@@ -1,0 +1,25 @@
+let
+	var a:int:=(5-2);
+	var b:float:=1.5;
+	var i:int:=100;
+in
+
+	a:=10;
+	b:= 2.35;
+
+	for a := 1-1 to 10 - 1
+	do
+		if 2>1
+		then
+			write "1";
+		else
+			write "2";
+		end
+	end
+	if i<1
+	then
+		write "1";
+	else
+		write "2";
+	end
+end
