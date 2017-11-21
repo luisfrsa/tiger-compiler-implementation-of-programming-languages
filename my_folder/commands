@@ -24,6 +24,8 @@ COMPILACAO
 ../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/tests_tiny/if.tiger
 ../gcc-install/bin/gcctiger -o min ../gcc-src/gcc/tiger/my_folder/tests_tiny/test_min.tiger
 ../gcc-install/bin/gcctiger -o t5 ../gcc-src/gcc/tiger/my_folder/tests_tiny/t5.tiger
+../gcc-install/bin/gcctiger -o for1 ../gcc-src/gcc/tiger/my_folder/tests_tiny/for1.tiger
+../gcc-install/bin/gcctiger -o for2 ../gcc-src/gcc/tiger/my_folder/tests_tiny/for2.tiger
 
 
 ip: 10.30.11.19

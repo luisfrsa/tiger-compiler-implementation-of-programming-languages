@@ -402,7 +402,8 @@ Parser::parse_statement_seq (bool (Parser::*done) ())
   // Parse statements until done and append to the current stmt list;
   while (!(this->*done) ())
     {
-      Tree stmt = parse_statement ();
+      //Tree stmt = parse_statement ();
+      Tree stmt = parse_expression ();
       //printf("STMT de parse_statement do tipo %s stmt \n",print_type (stmt.get_type ()));
       get_current_stmt_list ().append (stmt);
       get_current_stmt_list ().set_tipo(stmt.get_type ());
@@ -540,13 +541,15 @@ Parser::parse_statement ()
   
     /*Tiger*/
     default:
-/*
       unexpected_token (t);
       skip_after_semicolon_or_other ();
       return Tree::error ();
       break;
+      /*      
+      //return null_denotation(t);
+      return parse_expression();
+      break;
       */
-      return null_denotation(t);
     }
 
   gcc_unreachable ();
@@ -1815,9 +1818,12 @@ Parser::null_denotation(const_TokenPtr tok) {
     */
     //Tiger
   default:
+    return parse_statement();
+  /*
     unexpected_token(tok);
     skip_after_semicolon_or_other();
     return Tree::error();
+    */
   }
 }
 
