@@ -1,6 +1,7 @@
 let
-	var a:int:=(5-2);
-	var b:float:=1.5;
+	var a1:int:=
+	var a:int:=(5-2)
+	var b:float:=1.5
 in
 	write a;
 	write b;
