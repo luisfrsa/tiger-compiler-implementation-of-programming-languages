@@ -579,6 +579,212 @@ Parser::parse_declaration_let ()
 
 }
 /*
+===(6)===
+A Pratt parser defines the concept of binding power as some sort of priority number: the 
+higher the binding power the more priority the operand has. This parser associates three 
+extra values to the tokens of expressions: a left binding power, a null denotation 
+function and a left denotation function.
+
+Parsing an expression requires a right binding power. A top level expression 
+will use the lowest priority possible. Then the parser starts by peeking the 
+current token t1 and skipping it. Then it invokes the null denotation function 
+of t1. If this token cannot appear at this point then its null denotation 
+function will diagnose an error and the parsing will end at this point. 
+Otherwise the null denotation function will do something (that may include 
+advancing the token stream, more on this later). Once we are back from 
+the null denotation, the parser checks if the current right binding power 
+is lower or than that of the current token (call it t2, but note that 
+it may not be the next one after t1). If it is not, parsing ends here. 
+Otherwise the parser skips the token and the left denotation function is 
+invoked on t2. The left denotation function (will do something, including 
+advancing the current token, more on this later). Once we are back from the 
+left denotation we will check again if the current token has a higher left 
+binding power than the current right binding power and proceed likewise.
+
+Ok, I tried, but the explanation above is rather dense. Behold the stunning 
+simplicity of this parser at its core.
+*/
+// This is a Pratt parser
+Tree
+Parser::parse_expression (int right_binding_power)
+{
+  const_TokenPtr current_token = lexer.peek_token ();
+  lexer.skip_token ();
+
+  Tree expr = null_denotation (current_token);
+
+  if (expr.is_error ())
+    return Tree::error ();
+
+  while (right_binding_power < left_binding_power (lexer.peek_token ())){
+      current_token = lexer.peek_token();
+      lexer.skip_token ();
+
+      expr = left_denotation (current_token, expr);
+      if (expr.is_error ())
+	     return Tree::error ();
+  }
+  printf("FIM EXP, TIPO   %s \n ",print_type (expr.get_type ()));
+
+  return expr;
+}
+
+/*
+===(7)===
+There is little to do now for identifiers, real, integer and string literals. 
+So they trivially return true (lines 6 to 10).
+
+If the current token is ( (line 11) it means that we have to parse a whole 
+expression. So we do by recursively invoking parse_expression (with the lowest 
+priority possible, as if it were a top-level expression). When we return from 
+parse_expression we have to make sure that the current token is ) (line 16).
+
+If the current token is +, – or not (lines 18, 24, 30) it means that this is 
+a unary operator. We will invoke parse_expression recursively with the 
+appropiate priority for each operand (LBP_UNARY_PLUS, LBP_UNARY_NEG, LBP_LOGICAL_NOT, more on this later).
+
+It may not be obvious now, but tok, is not the current token in the input 
+stream but the previous one since parse_expression already skipped tok before calling null_denotation.
+*/
+// This is invoked when a token (including prefix operands) is found at a
+// "prefix" position
+Tree
+Parser::null_denotation(const_TokenPtr tok) {
+  /*
+  Note that using Tree rather than the GENERIC tree is essential for primaries. 
+  In the code above s->get_tree_decl() returns a tree with the location of the 
+  variable declaration. We could use this tree but for diagnostics purposes we 
+  want the location where the variable is being referenced.
+
+  For literals, the literal itself encodes the value. So the text of the token 
+  will have to be interpreted as the appropiate value. For integers we can just use atoi.
+  */
+  switch (tok->get_id()) {
+  case Tiger::IDENTIFIER:
+    {
+      SymbolPtr s = query_variable(tok->get_str(), tok->get_locus());
+      if (s == NULL)
+        return Tree::error();
+      return Tree(s->get_tree_decl(), tok->get_locus());
+    }
+  case Tiger::INTEGER_LITERAL:
+    // FIXME : check ranges
+    return Tree(build_int_cst_type(integer_type_node, atoi(tok->get_str().c_str())),
+      tok->get_locus());
+    break;
+    /*
+  For a real literal we have to invoke the (GCC-provided) function real_from_string3 (line 27) 
+  to get a real value representation from a string. This function expects the machine (i.e. architecture dependent)
+  mode of the type, that we can obtain using TYPE_MODE. It returns its value in a REAL_VALUE_TYPE that then can 
+  be used to build a real constant tree using the (GCC-provided) function build_real.
+      */
+  case Tiger::REAL_LITERAL:
+    {
+      REAL_VALUE_TYPE real_value;
+      real_from_string3( & real_value,tok->get_str().c_str(),TYPE_MODE(float_type_node));
+      return Tree(build_real(float_type_node, real_value),tok->get_locus());
+    }
+    break;
+  /*
+  To create a string literal we use the (GCC-provided) function build_string_literal. 
+  For practical reasons our string literal will contain the NULL terminator, otherwise 
+  the string literal itself will not be useable in C functions (more on this later).
+
+  While the type GENERIC trees created for integer and real literals was obviously 
+  integer_type_node and float_type_node, it is not so clear for string literals. 
+  The tree created by build_string_literal has type pointer to a character type. 
+  Pointer types have a tree code of POINTER_TYPE and the pointee type is found in TREE_TYPE.
+  Sometimes we will need to check if an expression has the type of a string literal, 
+  so we will use the following auxiliar function.
+      */
+  case Tiger::STRING_LITERAL:
+    {
+      std::string str = tok->get_str();
+      const char * c_str = str.c_str();
+      return Tree(build_string_literal(::strlen(c_str) + 1, c_str),tok->get_locus());
+    }
+    break;
+  case Tiger::TRUE_LITERAL:
+    {
+      return Tree(build_int_cst_type(boolean_type_node, 1),tok->get_locus());
+    }
+    break;
+  case Tiger::FALSE_LITERAL:
+    {
+      return Tree(build_int_cst_type(boolean_type_node, 0),tok->get_locus());
+    }
+    break;
+  case Tiger::LEFT_PAREN:
+    {
+      Tree expr = parse_expression();
+      tok = lexer.peek_token();
+      if (tok->get_id() != Tiger::RIGHT_PAREN)
+        error_at(tok->get_locus(), "expecting ) but %s found\n",tok->get_token_description());
+      else
+        lexer.skip_token();
+      return Tree(expr, tok->get_locus());
+    }
+  case Tiger::PLUS:
+    {
+      Tree expr = parse_expression(LBP_UNARY_PLUS);
+      if (expr.is_error())
+        return Tree::error();
+      if (expr.get_type() != integer_type_node || expr.get_type() != float_type_node) {
+        error_at(tok->get_locus(),"operand of unary plus must be int or float but it is %s",print_type(expr.get_type()));
+        return Tree::error();
+      }
+      return Tree(expr, tok->get_locus());
+    }
+  case Tiger::MINUS:
+    {
+      Tree expr = parse_expression(LBP_UNARY_MINUS);
+      if (expr.is_error())
+        return Tree::error();
+
+      if (expr.get_type() != integer_type_node || expr.get_type() != float_type_node) {
+        error_at(tok->get_locus(),"operand of unary minus must be int or float but it is %s",print_type(expr.get_type()));
+        return Tree::error();
+      }
+
+      expr = build_tree(NEGATE_EXPR, tok->get_locus(), expr.get_type(), expr);
+      return expr;
+    }
+  case Tiger::NOT:
+    {
+      Tree expr = parse_expression(LBP_LOGICAL_NOT);
+      if (expr.is_error())
+        return Tree::error();
+
+      if (expr.get_type() != boolean_type_node) {
+        error_at(tok->get_locus(),"operand of logical not must be a boolean but it is %s",print_type(expr.get_type()));
+        return Tree::error();
+      }
+
+      expr = build_tree(TRUTH_NOT_EXPR, tok->get_locus(), boolean_type_node, expr);
+      return expr;
+    }
+    //Tiger
+    /*
+  case Tiger::IF:
+    {
+      //Tree exp_if = Tree(parse_if_statement(1), tok->get_locus());
+      Tree exp_if = parse_if_statement(1);
+      printf("EXP IF TIPO   %s \n ", print_type(exp_if.get_type()));
+      return exp_if;
+      //return Tree (parse_if_statement (1),tok->get_locus ());
+    }
+    */
+    //Tiger
+  default:
+    return parse_statement();
+  /*
+    unexpected_token(tok);
+    skip_after_semicolon_or_other();
+    return Tree::error();
+    */
+  }
+}
+/*
 We first parse the syntactic elements of a variable declaration. We skip the initial var in lines 4 to 8. 
 In line 10 we keep the identifier token because it will be used later. We skip the colon in lines 17 to 21. 
 In line 23 we parse the type (by calling parse_type, more on this later) and finally in line 31 we skip the semicolon.
@@ -625,11 +831,10 @@ Parser::parse_variable_declaration (){
       return Tree::error ();
     }
   const_TokenPtr identifier = expect_token (Tiger::IDENTIFIER);
-  if (identifier == NULL)
-    {
+  if (identifier == NULL){
       skip_before_new_declaration ();
       return Tree::error ();
-    }
+  }
 
   const_TokenPtr tok = lexer.peek_token ();
   if (tok->get_id () == Tiger::COLON){
@@ -651,7 +856,7 @@ Parser::parse_variable_declaration (){
 
   }else{
     assig_tok = expect_token (Tiger::ASSIG);
-    if (assig_tok == NULL){//var a :int:=
+    if (assig_tok == NULL){
         skip_before_new_declaration ();
         return Tree::error ();
     }   
@@ -663,6 +868,8 @@ Parser::parse_variable_declaration (){
     expr = parse_expression ();
     if (expr.is_error ())
       return Tree::error ();
+  fiz aqui, gettype para var a :=1;
+  	type_tree = expr.get_type(); 
     
   }
 
@@ -1620,212 +1827,7 @@ enum binding_powers
   LBP_LOWEST = 0,
 };
 }
-/*
-===(6)===
-A Pratt parser defines the concept of binding power as some sort of priority number: the 
-higher the binding power the more priority the operand has. This parser associates three 
-extra values to the tokens of expressions: a left binding power, a null denotation 
-function and a left denotation function.
-
-Parsing an expression requires a right binding power. A top level expression 
-will use the lowest priority possible. Then the parser starts by peeking the 
-current token t1 and skipping it. Then it invokes the null denotation function 
-of t1. If this token cannot appear at this point then its null denotation 
-function will diagnose an error and the parsing will end at this point. 
-Otherwise the null denotation function will do something (that may include 
-advancing the token stream, more on this later). Once we are back from 
-the null denotation, the parser checks if the current right binding power 
-is lower or than that of the current token (call it t2, but note that 
-it may not be the next one after t1). If it is not, parsing ends here. 
-Otherwise the parser skips the token and the left denotation function is 
-invoked on t2. The left denotation function (will do something, including 
-advancing the current token, more on this later). Once we are back from the 
-left denotation we will check again if the current token has a higher left 
-binding power than the current right binding power and proceed likewise.
-
-Ok, I tried, but the explanation above is rather dense. Behold the stunning 
-simplicity of this parser at its core.
-*/
-// This is a Pratt parser
-Tree
-Parser::parse_expression (int right_binding_power)
-{
-  const_TokenPtr current_token = lexer.peek_token ();
-  lexer.skip_token ();
-
-  Tree expr = null_denotation (current_token);
-
-  if (expr.is_error ())
-    return Tree::error ();
-
-  while (right_binding_power < left_binding_power (lexer.peek_token ())){
-      current_token = lexer.peek_token();
-      lexer.skip_token ();
-
-      expr = left_denotation (current_token, expr);
-      if (expr.is_error ())
-	     return Tree::error ();
-  }
-  printf("FIM EXP, TIPO   %s \n ",print_type (expr.get_type ()));
-
-  return expr;
-}
-
-/*
-===(7)===
-There is little to do now for identifiers, real, integer and string literals. 
-So they trivially return true (lines 6 to 10).
-
-If the current token is ( (line 11) it means that we have to parse a whole 
-expression. So we do by recursively invoking parse_expression (with the lowest 
-priority possible, as if it were a top-level expression). When we return from 
-parse_expression we have to make sure that the current token is ) (line 16).
-
-If the current token is +, – or not (lines 18, 24, 30) it means that this is 
-a unary operator. We will invoke parse_expression recursively with the 
-appropiate priority for each operand (LBP_UNARY_PLUS, LBP_UNARY_NEG, LBP_LOGICAL_NOT, more on this later).
-
-It may not be obvious now, but tok, is not the current token in the input 
-stream but the previous one since parse_expression already skipped tok before calling null_denotation.
-*/
-// This is invoked when a token (including prefix operands) is found at a
-// "prefix" position
-Tree
-Parser::null_denotation(const_TokenPtr tok) {
-  /*
-  Note that using Tree rather than the GENERIC tree is essential for primaries. 
-  In the code above s->get_tree_decl() returns a tree with the location of the 
-  variable declaration. We could use this tree but for diagnostics purposes we 
-  want the location where the variable is being referenced.
-
-  For literals, the literal itself encodes the value. So the text of the token 
-  will have to be interpreted as the appropiate value. For integers we can just use atoi.
-  */
-  switch (tok->get_id()) {
-  case Tiger::IDENTIFIER:
-    {
-      SymbolPtr s = query_variable(tok->get_str(), tok->get_locus());
-      if (s == NULL)
-        return Tree::error();
-      return Tree(s->get_tree_decl(), tok->get_locus());
-    }
-  case Tiger::INTEGER_LITERAL:
-    // FIXME : check ranges
-    return Tree(build_int_cst_type(integer_type_node, atoi(tok->get_str().c_str())),
-      tok->get_locus());
-    break;
-    /*
-  For a real literal we have to invoke the (GCC-provided) function real_from_string3 (line 27) 
-  to get a real value representation from a string. This function expects the machine (i.e. architecture dependent)
-  mode of the type, that we can obtain using TYPE_MODE. It returns its value in a REAL_VALUE_TYPE that then can 
-  be used to build a real constant tree using the (GCC-provided) function build_real.
-      */
-  case Tiger::REAL_LITERAL:
-    {
-      REAL_VALUE_TYPE real_value;
-      real_from_string3( & real_value,tok->get_str().c_str(),TYPE_MODE(float_type_node));
-      return Tree(build_real(float_type_node, real_value),tok->get_locus());
-    }
-    break;
-  /*
-  To create a string literal we use the (GCC-provided) function build_string_literal. 
-  For practical reasons our string literal will contain the NULL terminator, otherwise 
-  the string literal itself will not be useable in C functions (more on this later).
-
-  While the type GENERIC trees created for integer and real literals was obviously 
-  integer_type_node and float_type_node, it is not so clear for string literals. 
-  The tree created by build_string_literal has type pointer to a character type. 
-  Pointer types have a tree code of POINTER_TYPE and the pointee type is found in TREE_TYPE.
-  Sometimes we will need to check if an expression has the type of a string literal, 
-  so we will use the following auxiliar function.
-      */
-  case Tiger::STRING_LITERAL:
-    {
-      std::string str = tok->get_str();
-      const char * c_str = str.c_str();
-      return Tree(build_string_literal(::strlen(c_str) + 1, c_str),tok->get_locus());
-    }
-    break;
-  case Tiger::TRUE_LITERAL:
-    {
-      return Tree(build_int_cst_type(boolean_type_node, 1),tok->get_locus());
-    }
-    break;
-  case Tiger::FALSE_LITERAL:
-    {
-      return Tree(build_int_cst_type(boolean_type_node, 0),tok->get_locus());
-    }
-    break;
-  case Tiger::LEFT_PAREN:
-    {
-      Tree expr = parse_expression();
-      tok = lexer.peek_token();
-      if (tok->get_id() != Tiger::RIGHT_PAREN)
-        error_at(tok->get_locus(), "expecting ) but %s found\n",tok->get_token_description());
-      else
-        lexer.skip_token();
-      return Tree(expr, tok->get_locus());
-    }
-  case Tiger::PLUS:
-    {
-      Tree expr = parse_expression(LBP_UNARY_PLUS);
-      if (expr.is_error())
-        return Tree::error();
-      if (expr.get_type() != integer_type_node || expr.get_type() != float_type_node) {
-        error_at(tok->get_locus(),"operand of unary plus must be int or float but it is %s",print_type(expr.get_type()));
-        return Tree::error();
-      }
-      return Tree(expr, tok->get_locus());
-    }
-  case Tiger::MINUS:
-    {
-      Tree expr = parse_expression(LBP_UNARY_MINUS);
-      if (expr.is_error())
-        return Tree::error();
-
-      if (expr.get_type() != integer_type_node || expr.get_type() != float_type_node) {
-        error_at(tok->get_locus(),"operand of unary minus must be int or float but it is %s",print_type(expr.get_type()));
-        return Tree::error();
-      }
-
-      expr = build_tree(NEGATE_EXPR, tok->get_locus(), expr.get_type(), expr);
-      return expr;
-    }
-  case Tiger::NOT:
-    {
-      Tree expr = parse_expression(LBP_LOGICAL_NOT);
-      if (expr.is_error())
-        return Tree::error();
-
-      if (expr.get_type() != boolean_type_node) {
-        error_at(tok->get_locus(),"operand of logical not must be a boolean but it is %s",print_type(expr.get_type()));
-        return Tree::error();
-      }
-
-      expr = build_tree(TRUTH_NOT_EXPR, tok->get_locus(), boolean_type_node, expr);
-      return expr;
-    }
-    //Tiger
-    /*
-  case Tiger::IF:
-    {
-      //Tree exp_if = Tree(parse_if_statement(1), tok->get_locus());
-      Tree exp_if = parse_if_statement(1);
-      printf("EXP IF TIPO   %s \n ", print_type(exp_if.get_type()));
-      return exp_if;
-      //return Tree (parse_if_statement (1),tok->get_locus ());
-    }
-    */
-    //Tiger
-  default:
-    return parse_statement();
-  /*
-    unexpected_token(tok);
-    skip_after_semicolon_or_other();
-    return Tree::error();
-    */
-  }
-}
+//ANTIGA FUNCAO NULL E PARSE EXP ESTAVAM AQUI
 
 
 // This implements priorities
