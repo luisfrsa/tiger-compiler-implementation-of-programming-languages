@@ -49,6 +49,42 @@ using namespace std; //alteracao_luis
 #include "fold-const.h"
 
 
+namespace
+{
+enum binding_powers
+{
+  // Highest priority
+  LBP_HIGHEST = 100,
+
+  LBP_DOT = 90,
+
+  LBP_ARRAY_REF = 80,
+
+  LBP_UNARY_PLUS = 50,  // Used only when the null denotation is +
+  LBP_UNARY_MINUS = LBP_UNARY_PLUS, // Used only when the null denotation is -
+
+  LBP_MUL = 40,
+  LBP_DIV = LBP_MUL,
+  LBP_MOD = LBP_MUL,
+
+  LBP_PLUS = 30,
+  LBP_MINUS = LBP_PLUS,
+
+  LBP_EQUAL = 20,
+  LBP_DIFFERENT = LBP_EQUAL,
+  LBP_LOWER_THAN = LBP_EQUAL,
+  LBP_LOWER_EQUAL = LBP_EQUAL,
+  LBP_GREATER_THAN = LBP_EQUAL,
+  LBP_GREATER_EQUAL = LBP_EQUAL,
+
+  LBP_LOGICAL_AND = 10,
+  LBP_LOGICAL_OR = LBP_LOGICAL_AND,
+  LBP_LOGICAL_NOT = LBP_LOGICAL_AND,
+
+  // Lowest priority
+  LBP_LOWEST = 0,
+};
+}
 
 namespace Tiger
 {
@@ -168,7 +204,7 @@ public:
   Tree parse_record ();
   Tree parse_field_declaration (std::vector<std::string> &field_names);
 
-  Tree parse_assignment_statement ();
+  Tree parse_assignment_statement (Tree variable);
   Tree parse_if_statement ();
   Tree parse_if_statement (int i);
   Tree parse_while_statement ();
@@ -182,6 +218,9 @@ public:
   Tree parse_boolean_expression ();
   Tree parse_integer_expression ();
 
+  /*Tiger*/
+  Tree parse_statement (const_TokenPtr t);
+  /*Tiger*/
 private:
   Lexer &lexer;
   Scope scope;
@@ -315,6 +354,8 @@ Parser::unexpected_token (const_TokenPtr t)
 void
 Parser::parse_program ()
 {
+  printf("parse_program\n");
+
   // Built type of main "int (int, char**)"
   tree main_fndecl_type_param[] = {integer_type_node,/* int */
                                    build_pointer_type (build_pointer_type (char_type_node)) /* char** */  
@@ -399,6 +440,8 @@ we parameterize the finalization condition. Something like this.
 void
 Parser::parse_statement_seq (bool (Parser::*done) ())
 {
+  printf("parse_statement_seq\n");
+
   // Parse statements until done and append to the current stmt list;
   while (!(this->*done) ())
     {
@@ -487,6 +530,14 @@ all tokens until a semicolon is found.
 Tree
 Parser::parse_statement ()
 {
+  const_TokenPtr t = lexer.peek_token ();
+
+  return parse_statement (t);
+}
+  Tree
+Parser::parse_statement (const_TokenPtr t)
+{
+
   /*
     statement ->  variable_declaration
 	   |  assignment_statement
@@ -496,8 +547,8 @@ Parser::parse_statement ()
 	   |  read_statement
 	   |  write_statement
 	   */
-  const_TokenPtr t = lexer.peek_token ();
-
+  printf("parse_statement\n");
+  printf("---tkn  %s\n", t->get_token_description ());
   switch (t->get_id ())
     {
    /* case Tiger::VAR:
@@ -522,9 +573,11 @@ Parser::parse_statement ()
     case Tiger::WRITE:
       return parse_write_statement ();
       break;
+      /*
     case Tiger::IDENTIFIER:
       return parse_assignment_statement ();
       break;
+      */
     /*Tiger*/
     case Tiger::LET:
       return parse_let_statement ();
@@ -557,6 +610,7 @@ Parser::parse_statement ()
 Tree
 Parser::parse_declaration_let ()
 {
+ printf("parse_declaration_let\n");
  const_TokenPtr t = lexer.peek_token ();
  switch (t->get_id ())
     {
@@ -608,6 +662,8 @@ simplicity of this parser at its core.
 Tree
 Parser::parse_expression (int right_binding_power)
 {
+  printf("parse_expression\n");
+
   const_TokenPtr current_token = lexer.peek_token ();
   lexer.skip_token ();
 
@@ -659,14 +715,19 @@ Parser::null_denotation(const_TokenPtr tok) {
   For literals, the literal itself encodes the value. So the text of the token 
   will have to be interpreted as the appropiate value. For integers we can just use atoi.
   */
+  printf("null_denotation\n");
+
   switch (tok->get_id()) {
-  case Tiger::IDENTIFIER:
-    {
+  case Tiger::IDENTIFIER:{
       SymbolPtr s = query_variable(tok->get_str(), tok->get_locus());
-      if (s == NULL)
+      if(lexer.peek_token()->get_id () == Tiger::ASSIG){
+        return parse_assignment_statement (Tree(s->get_tree_decl(), tok->get_locus()));
+      }else if (s == NULL){
         return Tree::error();
-      return Tree(s->get_tree_decl(), tok->get_locus());
-    }
+      }else{
+        return Tree(s->get_tree_decl(), tok->get_locus());
+      }
+  }
   case Tiger::INTEGER_LITERAL:
     // FIXME : check ranges
     return Tree(build_int_cst_type(integer_type_node, atoi(tok->get_str().c_str())),
@@ -776,7 +837,7 @@ Parser::null_denotation(const_TokenPtr tok) {
     */
     //Tiger
   default:
-    return parse_statement();
+    return parse_statement(tok);
   /*
     unexpected_token(tok);
     skip_after_semicolon_or_other();
@@ -820,6 +881,8 @@ later when we talk about blocks.
 */
 Tree
 Parser::parse_variable_declaration (){
+ printf("parse_variable_declaration\n");
+
   Tree type_tree;
   Tree expr;
   const_TokenPtr first_of_expr;
@@ -868,7 +931,7 @@ Parser::parse_variable_declaration (){
     expr = parse_expression ();
     if (expr.is_error ())
       return Tree::error ();
-  fiz aqui, gettype para var a :=1;
+  //fiz aqui, gettype para var a :=1;
   	type_tree = expr.get_type(); 
     
   }
@@ -1251,19 +1314,16 @@ Parser::query_integer_variable (const std::string &name, location_t loc)
 }
 
 Tree
-Parser::parse_assignment_statement (){
-    // assignment_statement -> expression ":=" expression ";"
-  Tree variable = parse_lhs_assignment_expression ();
-  //verifica se retorno possui erros
+Parser::parse_assignment_statement (Tree variable){
+  // assignment_statement -> expression ":=" expression ";"
+  //Tree variable = parse_lhs_assignment_expression ();
   if (variable.is_error ())
     return Tree::error ();
-  //verifica se tkn = ":="
   const_TokenPtr assig_tok = expect_token (Tiger::ASSIG);
-  if (assig_tok == NULL)
-    {
+  if (assig_tok == NULL){
       skip_after_semicolon_or_other ();
       return Tree::error ();
-    }
+  }
 
   const_TokenPtr first_of_expr = lexer.peek_token ();
 
@@ -1276,13 +1336,9 @@ Parser::parse_assignment_statement (){
 
   skip_token (Tiger::SEMICOLON);
 
-  if (variable.get_type () != expr.get_type ()){
-    error_at (first_of_expr->get_locus (),
-		"cannot assign value of type %s to a variable of type %s",
-		print_type (expr.get_type ()),
-		print_type (variable.get_type ()));
+  if (variable.get_type () != expr.get_type ()){error_at (first_of_expr->get_locus (),		"cannot assign value of type %s to a variable of type %s",		print_type (expr.get_type ()),		print_type (variable.get_type ()));
     return Tree::error ();
-    }
+  }
     /*
     Tree assig_expr = build_tree (MODIFY_EXPR, assig_tok->get_locus (),void_type_node, variable, expr);
     retornando o tipo da atribuição, antes era void_type_node
@@ -1380,12 +1436,13 @@ Parser::parse_if_statement ()
 Tree
 Parser::parse_if_statement (int tkn_if)
 {
+  /*
   if (tkn_if==0 && !skip_token (Tiger::IF))
     {
       skip_after_end ();
       return Tree::error ();
     }
-
+*/
   Tree expr = parse_boolean_expression ();
 
   skip_token (Tiger::THEN);
@@ -1484,12 +1541,13 @@ Parser::parse_literal_statement(){
 
 Tree
 Parser::parse_let_statement(){
-
-  if (!skip_token (Tiger::LET))
+  printf("parse_let_statement\n");
+  /*if (!skip_token (Tiger::LET))
   { 
     skip_after_end ();
     return Tree::error ();
   }
+  */
   //enter_scope ();
   //parse_let_declaration_seq (&Parser::done_in);
   //Tree decl = parse_let_declaration_seq ();
@@ -1499,15 +1557,14 @@ Parser::parse_let_statement(){
 
   //Tree in_stmt;
   const_TokenPtr tok = lexer.peek_token ();
-  if (tok->get_id () == Tiger::IN)
-    {
+  if (tok->get_id () == Tiger::IN){
       skip_token (Tiger::IN);
       enter_scope ();
       parse_statement_seq (&Parser::done_end);
       /*TreeSymbolMapping in_tree_scope = leave_scope ();
       in_stmt = in_tree_scope.bind_expr;
       */
-    }
+  }
 
   skip_token (Tiger::END);
 
@@ -1531,12 +1588,13 @@ Parser::parse_let_statement(){
 Tree
 Parser::parse_while_statement ()
 {
+  /*
   if (!skip_token (Tiger::WHILE))
     {
       skip_after_end ();
       return Tree::error ();
     }
-
+*/
   Tree expr = parse_boolean_expression ();
   if (!skip_token (Tiger::DO))
     {
@@ -1599,12 +1657,13 @@ Parser::build_for_statement (SymbolPtr ind_var, Tree lower_bound, Tree upper_bou
 Tree
 Parser::parse_for_statement ()
 {
+  /*
   if (!skip_token (Tiger::FOR))
     {
       skip_after_end ();
       return Tree::error ();
     }
-
+*/
   const_TokenPtr identifier = expect_token (Tiger::IDENTIFIER);
   if (identifier == NULL)
     {
@@ -1666,10 +1725,11 @@ Parser::get_scanf_addr ()
 Tree
 Parser::parse_read_statement ()
 {
+  /*
   if (!skip_token (Tiger::READ)) {
     skip_after_semicolon_or_other ();
     return Tree::error ();
-  }
+  }*/
 
   const_TokenPtr first_of_expr = lexer.peek_token ();
   Tree expr = parse_expression_naming_variable ();
@@ -1740,12 +1800,12 @@ Tree
 Parser::parse_write_statement ()
 {
   // write_statement -> "write" expression ";"
-
+/*
   if (!skip_token (Tiger::WRITE)){
     skip_after_semicolon_or_other ();
     return Tree::error ();
   }
-
+*/
   const_TokenPtr first_of_expr = lexer.peek_token ();
   Tree expr = parse_expression ();
 
@@ -1791,42 +1851,7 @@ Parser::parse_write_statement ()
 
   gcc_unreachable ();
 }
-namespace
-{
-enum binding_powers
-{
-  // Highest priority
-  LBP_HIGHEST = 100,
-
-  LBP_DOT = 90,
-
-  LBP_ARRAY_REF = 80,
-
-  LBP_UNARY_PLUS = 50,  // Used only when the null denotation is +
-  LBP_UNARY_MINUS = LBP_UNARY_PLUS, // Used only when the null denotation is -
-
-  LBP_MUL = 40,
-  LBP_DIV = LBP_MUL,
-  LBP_MOD = LBP_MUL,
-
-  LBP_PLUS = 30,
-  LBP_MINUS = LBP_PLUS,
-
-  LBP_EQUAL = 20,
-  LBP_DIFFERENT = LBP_EQUAL,
-  LBP_LOWER_THAN = LBP_EQUAL,
-  LBP_LOWER_EQUAL = LBP_EQUAL,
-  LBP_GREATER_THAN = LBP_EQUAL,
-  LBP_GREATER_EQUAL = LBP_EQUAL,
-
-  LBP_LOGICAL_AND = 10,
-  LBP_LOGICAL_OR = LBP_LOGICAL_AND,
-  LBP_LOGICAL_NOT = LBP_LOGICAL_AND,
-
-  // Lowest priority
-  LBP_LOWEST = 0,
-};
-}
+//antiga binding_powers aqui
 //ANTIGA FUNCAO NULL E PARSE EXP ESTAVAM AQUI
 
 
