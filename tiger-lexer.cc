@@ -273,18 +273,6 @@ Lexer::build_token ()
 	case '%':
 	  current_column++;
 	  return Token::make (PERCENT, loc);
-	/*case '#': /* comment 
-	  current_column++;
-	  current_char = peek_input ();
-	  while (current_char != '\n')
-	    {
-	      skip_input ();
-	      current_column++; // won't be used
-	      current_char = peek_input ();
-	    }
-	  continue;
-	  break;
-	  */
 	case '[':
 	  current_column++;
 	  return Token::make (LEFT_SQUARE, loc);

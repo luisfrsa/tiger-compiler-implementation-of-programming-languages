@@ -1,7 +1,7 @@
 let
-	var a:int:=(5-2);
-	var b:float:=1.5;
-	var i:int:=100;
+	var a:int:=(5-2)
+	var b:float:=1.5
+	var i:int:=100
 in
 
 	a:=10;
@@ -9,17 +9,17 @@ in
 
 	for a := 1-1 to 10 - 1
 	do
-		if 2>1
+		if a>5
 		then
-			write "1";
+			print("1");
 		else
-			write "2";
+			print("2");
 		end
 	end
 	if i<1
 	then
-		write "1";
+		print("1h");
 	else
-		write "2";
+		print("2h");
 	end
 end

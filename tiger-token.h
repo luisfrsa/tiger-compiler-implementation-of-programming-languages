@@ -81,7 +81,6 @@ MANTENDO FLOAT, BOOL, TRUE E FALSE LITERAL, write (trocar por print)
   TIGER_TOKEN_KEYWORD (TYPE, "type")                                            \
   TIGER_TOKEN_KEYWORD (VAR, "var")                                              \
   TIGER_TOKEN_KEYWORD (WHILE, "while")                                          \
-  TIGER_TOKEN_KEYWORD (WRITE, "write")                                          \
   TIGER_TOKEN (LAST_TOKEN, "<last-token-marker>")
 
 enum /* class */ TokenId

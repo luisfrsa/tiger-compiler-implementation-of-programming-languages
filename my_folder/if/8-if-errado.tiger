@@ -1,0 +1,6 @@
+/* error : types of then - else differ */
+
+if 5>4 then  if 6>4 
+then "str"
+else "str"
+else 2

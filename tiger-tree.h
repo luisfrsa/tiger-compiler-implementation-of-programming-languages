@@ -128,10 +128,21 @@ public:
   {
     return TREE_TYPE (t);
   }
+  Tree
+  get_last_stmt () const
+  {
+    return *last_stmt;
+  }
+  void
+  set_last_stmt (Tree s) 
+  {
+    *last_stmt = s;
+  }
 
 private:
   tree t;
   location_t loc;
+  Tree *last_stmt;
 };
 /*
 A GENERIC tree is actually a pointer, so comparison by identity is possible. 

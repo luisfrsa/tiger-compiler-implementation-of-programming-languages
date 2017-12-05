@@ -1,0 +1,1524 @@
+[1mdiff --git a/my_folder/commands b/my_folder/commands[m
+[1mindex 57db2a1..e7f9d38 100644[m
+[1m--- a/my_folder/commands[m
+[1m+++ b/my_folder/commands[m
+[36m@@ -27,6 +27,20 @@[m [mCOMPILACAO[m
+ ../gcc-install/bin/gcctiger -o for1 ../gcc-src/gcc/tiger/my_folder/tests_tiny/for1.tiger[m
+ ../gcc-install/bin/gcctiger -o var ../gcc-src/gcc/tiger/my_folder/tests_tiny/var.tiger[m
+ [m
+[32m+[m[32mifs[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/1-if-false.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/2-then-else-differ.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/3-then-else-differ-aninhado.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/4-then-else-eq-aninhado.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/5-then-else-differ-aninhado-but-eq-aninhado.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/6-if-errado-tipos-diferentes.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/7-if-aninhado-duplo-correto.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/8-if-errado.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/9-if-aninhado-correto-else.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/10-if-true.tiger[m
+[32m+[m[32m../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/11-custon.tiger[m[41m [m
+[32m+[m[32mifs[m
+[32m+[m
+ [m
+ ip: 10.30.11.19[m
+ usuário: ra67403inf[m
+[1mdiff --git a/my_folder/tests_tiny/for1.tiger b/my_folder/tests_tiny/for1.tiger[m
+[1mindex e03bde8..0575257 100644[m
+[1m--- a/my_folder/tests_tiny/for1.tiger[m
+[1m+++ b/my_folder/tests_tiny/for1.tiger[m
+[36m@@ -2,6 +2,7 @@[m [mlet[m
+    var i:=10[m
+ in[m
+ 	(for i := 1 to 50 do[m
+[31m-		write ("loop for");[m
+[32m+[m		[32mwrite (i);[m
+[32m+[m		[32mwrite ("\n");[m
+ 	end)[m
+ end[m
+\ No newline at end of file[m
+[1mdiff --git a/my_folder/tests_tiny/let.tiger b/my_folder/tests_tiny/let.tiger[m
+[1mindex 66cbd80..2c91f54 100644[m
+[1m--- a/my_folder/tests_tiny/let.tiger[m
+[1m+++ b/my_folder/tests_tiny/let.tiger[m
+[36m@@ -2,13 +2,14 @@[m [mlet[m
+ 	var a:=(5-2)[m
+ 	var b:=(1+2+3+0.001)[m
+ in[m
+[31m-	write a;[m
+[31m-	write b;[m
+[32m+[m	[32mprint a;[m
+[32m+[m	[32mprint b;[m
+ 	a:=5;[m
+ 	b:=b+a;[m
+[31m-	write a;[m
+[31m-	write b;[m
+[32m+[m	[32mprint a;[m
+[32m+[m	[32mprint b;[m
+ 	for a := 1 to 10 do[m
+[31m-		write ("loop for");[m
+[32m+[m		[32mprint "loop for";[m
+[32m+[m		[32mprint ("loop for 2");[m
+ 	end[m
+ end[m
+[1mdiff --git a/my_folder/tests_tiny/test_min.tiger b/my_folder/tests_tiny/test_min.tiger[m
+[1mindex ea46b92..7c6b665 100644[m
+[1m--- a/my_folder/tests_tiny/test_min.tiger[m
+[1m+++ b/my_folder/tests_tiny/test_min.tiger[m
+[36m@@ -1,7 +1,7 @@[m
+ let[m
+[31m-	var a:int:=(5-2);[m
+[31m-	var b:float:=1.5;[m
+[31m-	var i:int:=100;[m
+[32m+[m	[32mvar a:int:=(5-2)[m
+[32m+[m	[32mvar b:float:=1.5[m
+[32m+[m	[32mvar i:int:=100[m
+ in[m
+ [m
+ 	a:=10;[m
+[36m@@ -9,17 +9,17 @@[m [min[m
+ [m
+ 	for a := 1-1 to 10 - 1[m
+ 	do[m
+[31m-		if 2>1[m
+[32m+[m		[32mif a>5[m
+ 		then[m
+[31m-			write "1";[m
+[32m+[m			[32mprint("1");[m
+ 		else[m
+[31m-			write "2";[m
+[32m+[m			[32mprint("2");[m
+ 		end[m
+ 	end[m
+ 	if i<1[m
+ 	then[m
+[31m-		write "1";[m
+[32m+[m		[32mprint("1h");[m
+ 	else[m
+[31m-		write "2";[m
+[32m+[m		[32mprint("2h");[m
+ 	end[m
+ end[m
+\ No newline at end of file[m
+[1mdiff --git a/my_folder/tests_tiny/var.tiger b/my_folder/tests_tiny/var.tiger[m
+[1mindex 24a5c12..70e7d73 100644[m
+[1m--- a/my_folder/tests_tiny/var.tiger[m
+[1m+++ b/my_folder/tests_tiny/var.tiger[m
+[36m@@ -1,3 +1,3 @@[m
+[31m-let [m
+[32m+[m[32mlet[m
+ in[m
+[31m-end[m
+[32m+[m[32mend[m
+\ No newline at end of file[m
+[1mdiff --git a/tiger-lexer.cc b/tiger-lexer.cc[m
+[1mindex 232130f..02562f9 100644[m
+[1m--- a/tiger-lexer.cc[m
+[1m+++ b/tiger-lexer.cc[m
+[36m@@ -273,18 +273,6 @@[m [mLexer::build_token ()[m
+ 	case '%':[m
+ 	  current_column++;[m
+ 	  return Token::make (PERCENT, loc);[m
+[31m-	/*case '#': /* comment [m
+[31m-	  current_column++;[m
+[31m-	  current_char = peek_input ();[m
+[31m-	  while (current_char != '\n')[m
+[31m-	    {[m
+[31m-	      skip_input ();[m
+[31m-	      current_column++; // won't be used[m
+[31m-	      current_char = peek_input ();[m
+[31m-	    }[m
+[31m-	  continue;[m
+[31m-	  break;[m
+[31m-	  */[m
+ 	case '[':[m
+ 	  current_column++;[m
+ 	  return Token::make (LEFT_SQUARE, loc);[m
+[1mdiff --git a/tiger-parser.cc b/tiger-parser.cc[m
+[1mindex be0d4dc..ab7f5eb 100644[m
+[1m--- a/tiger-parser.cc[m
+[1m+++ b/tiger-parser.cc[m
+[36m@@ -1,9 +1,9 @@[m
+ /* Tiger parser[m
+[31m-   Copyright (C) 2016 Free Software Foundation, Inc.[m
+[32m+[m[32m   Copyright(C) 2016 Free Software Foundation, Inc.[m
+ [m
+ GNU CC is free software; you can redistribute it and/or modify[m
+ it under the terms of the GNU General Public License as published by[m
+[31m-the Free Software Foundation; either version 3, or (at your option)[m
+[32m+[m[32mthe Free Software Foundation; either version 3, or(at your option)[m
+ any later version.[m
+ [m
+ GNU CC is distributed in the hope that it will be useful,[m
+[36m@@ -17,7 +17,7 @@[m [malong with GCC; see the file COPYING3.  If not see[m
+ [m
+ #include <iostream>[m
+ #include <memory>[m
+[31m-[m
+[32m+[m[32m#include <queue>//alteracao_luis[m
+ #include <fstream> //alteracao_luis[m
+ #include <algorithm>//alteracao_luis[m
+ #include <sstream>[m
+[36m@@ -48,7 +48,6 @@[m [musing namespace std; //alteracao_luis[m
+ #include "stor-layout.h"[m
+ #include "fold-const.h"[m
+ [m
+[31m-[m
+ namespace[m
+ {[m
+ enum binding_powers[m
+[36m@@ -91,38 +90,38 @@[m [mnamespace Tiger[m
+ struct Parser[m
+ {[m
+ private:[m
+[31m-  void skip_after_semicolon ();[m
+[31m-  void skip_after_end ();[m
+[32m+[m[32m  void skip_after_semicolon();[m
+[32m+[m[32m  void skip_after_end();[m
+ [m
+[31m-  bool skip_token (TokenId);[m
+[31m-  const_TokenPtr expect_token (TokenId);[m
+[31m-  void unexpected_token (const_TokenPtr);[m
+[32m+[m[32m  bool skip_token(TokenId);[m
+[32m+[m[32m  const_TokenPtr expect_token(TokenId);[m
+[32m+[m[32m  void unexpected_token(const_TokenPtr);[m
+ [m
+   // Expression parsing[m
+[31m-  int left_binding_power (const_TokenPtr tok);[m
+[31m-  Tree null_denotation (const_TokenPtr tok);[m
+[31m-  Tree left_denotation (const_TokenPtr tok, Tree left);[m
+[32m+[m[32m  int left_binding_power(const_TokenPtr tok);[m
+[32m+[m[32m  Tree null_denotation(const_TokenPtr tok, int assignment_paren);[m
+[32m+[m[32m  Tree left_denotation(const_TokenPtr tok, Tree left);[m
+ [m
+[31m-  Tree parse_expression (int right_binding_power);[m
+[32m+[m[32m  Tree parse_expression(int right_binding_power);[m
+ [m
+[31m-  Tree coerce_binary_arithmetic (const_TokenPtr tok, Tree *left, Tree *right);[m
+[31m-  bool check_logical_operands (const_TokenPtr tok, Tree left, Tree right);[m
+[32m+[m[32m  Tree coerce_binary_arithmetic(const_TokenPtr tok, Tree *left, Tree *right);[m
+[32m+[m[32m  bool check_logical_operands(const_TokenPtr tok, Tree left, Tree right);[m
+ [m
+[31m-  Tree get_printf_addr ();[m
+[31m-  Tree get_puts_addr ();[m
+[32m+[m[32m  Tree get_printf_addr();[m
+[32m+[m[32m  Tree get_puts_addr();[m
+ [m
+[31m-  Tree get_scanf_addr ();[m
+[32m+[m[32m  Tree get_scanf_addr();[m
+ [m
+[31m-  Tree build_label_decl (const char *name, location_t loc);[m
+[31m-  Tree build_if_statement (Tree bool_expr, Tree then_part, Tree else_part);[m
+[31m-  Tree build_while_statement (Tree bool_expr, Tree while_body);[m
+[31m-  Tree build_for_statement (SymbolPtr ind_var, Tree lower_bound, Tree upper_bound,Tree for_body_stmt_list);[m
+[32m+[m[32m  Tree build_label_decl(const char *name, location_t loc);[m
+[32m+[m[32m  Tree build_if_statement(Tree bool_expr, Tree then_part, Tree else_part);[m
+[32m+[m[32m  Tree build_while_statement(Tree bool_expr, Tree while_body);[m
+[32m+[m[32m  Tree build_for_statement(SymbolPtr ind_var, Tree lower_bound, Tree upper_bound,Tree for_body_stmt_list);[m
+ [m
+[31m-  const char *print_type (Tree type);[m
+[32m+[m[32m  const char *print_type(Tree type);[m
+ [m
+[31m-  TreeStmtList &get_current_stmt_list ();[m
+[32m+[m[32m  TreeStmtList &get_current_stmt_list();[m
+ [m
+[31m-  void enter_scope ();[m
+[32m+[m[32m  void enter_scope();[m
+ [m
+   struct TreeSymbolMapping[m
+   {[m
+[36m@@ -134,92 +133,94 @@[m [mprivate:[m
+     /*Tiger*/[m
+   };[m
+ [m
+[31m-  TreeSymbolMapping leave_scope ();[m
+[32m+[m[32m  TreeSymbolMapping leave_scope();[m
+ [m
+[31m-  SymbolPtr query_type (const std::string &name, location_t loc);[m
+[31m-  SymbolPtr query_variable (const std::string &name, location_t loc);[m
+[31m-  SymbolPtr query_integer_variable (const std::string &name, location_t loc);[m
+[32m+[m[32m  SymbolPtr query_type(const std::string &name, location_t loc);[m
+[32m+[m[32m  SymbolPtr query_variable(const std::string &name, location_t loc);[m
+[32m+[m[32m  SymbolPtr query_integer_variable(const std::string &name, location_t loc);[m
+ [m
+[31m-  void parse_statement_seq (bool (Parser::*done) ());[m
+[31m-  //Tree parse_statement_seq (bool (Parser::*done) ());[m
+[32m+[m[32m  void parse_statement_seq(bool(Parser::*done)());[m
+[32m+[m[32m  //Tree parse_statement_seq(bool(Parser::*done)());[m
+ [m
+[31m-  bool done_end ();[m
+[31m-  bool done_end_or_else ();[m
+[31m-  bool done_end_of_file ();[m
+[32m+[m[32m  bool done_end();[m
+[32m+[m[32m  bool done_end_or_else();[m
+[32m+[m[32m  bool done_end_of_file();[m
+ [m
+[31m-  typedef Tree (Parser::*BinaryHandler) (const_TokenPtr, Tree);[m
+[31m-  BinaryHandler get_binary_handler (TokenId id);[m
+[32m+[m[32m  typedef Tree(Parser::*BinaryHandler)(const_TokenPtr, Tree);[m
+[32m+[m[32m  BinaryHandler get_binary_handler(TokenId id);[m
+ [m
+    /*Tiger*/[m
+[31m-  void parse_let_declaration_seq (bool (Parser::*done) ());[m
+[31m-  bool done_in ();[m
+[32m+[m[32m  void parse_let_declaration_seq(bool(Parser::*done)());[m
+[32m+[m[32m  bool done_in();[m
+[32m+[m[32m  bool done_right_paren();[m
+   Tree parse_let_statement();[m
+   Tree parse_literal_statement();[m
+   Tree parse_declaration_let();[m
+   void skip_before_new_declaration();[m
+   void skip_after_semicolon_or_other();[m
+[32m+[m[32m  Tree parse_expression(int right_binding_power, int assignment_paren);[m
+ [m
+ [m
+   /*Tiger*/[m
+ [m
+ #define BINARY_HANDLER_LIST                                                    \[m
+[31m-  BINARY_HANDLER (plus, PLUS)                                                  \[m
+[31m-  BINARY_HANDLER (minus, MINUS)                                                \[m
+[31m-  BINARY_HANDLER (mult, ASTERISK)                                              \[m
+[31m-  BINARY_HANDLER (div, SLASH)                                                  \[m
+[31m-  BINARY_HANDLER (mod, PERCENT)                                                \[m
+[32m+[m[32m  BINARY_HANDLER(plus, PLUS)                                                  \[m
+[32m+[m[32m  BINARY_HANDLER(minus, MINUS)                                                \[m
+[32m+[m[32m  BINARY_HANDLER(mult, ASTERISK)                                              \[m
+[32m+[m[32m  BINARY_HANDLER(div, SLASH)                                                  \[m
+[32m+[m[32m  BINARY_HANDLER(mod, PERCENT)                                                \[m
+                                                                                \[m
+[31m-  BINARY_HANDLER (equal, EQUAL)                                                \[m
+[31m-  BINARY_HANDLER (different, DIFFERENT)                                        \[m
+[31m-  BINARY_HANDLER (lower_than, LOWER)                                           \[m
+[31m-  BINARY_HANDLER (lower_equal, LOWER_OR_EQUAL)                                 \[m
+[31m-  BINARY_HANDLER (greater_than, GREATER)                                       \[m
+[31m-  BINARY_HANDLER (greater_equal, GREATER_OR_EQUAL)                             \[m
+[32m+[m[32m  BINARY_HANDLER(equal, EQUAL)                                                \[m
+[32m+[m[32m  BINARY_HANDLER(different, DIFFERENT)                                        \[m
+[32m+[m[32m  BINARY_HANDLER(lower_than, LOWER)                                           \[m
+[32m+[m[32m  BINARY_HANDLER(lower_equal, LOWER_OR_EQUAL)                                 \[m
+[32m+[m[32m  BINARY_HANDLER(greater_than, GREATER)                                       \[m
+[32m+[m[32m  BINARY_HANDLER(greater_equal, GREATER_OR_EQUAL)                             \[m
+                                                                                \[m
+[31m-  BINARY_HANDLER (logical_and, AND)                                            \[m
+[31m-  BINARY_HANDLER (logical_or, OR)                                              \[m
+[32m+[m[32m  BINARY_HANDLER(logical_and, AND)                                            \[m
+[32m+[m[32m  BINARY_HANDLER(logical_or, OR)                                              \[m
+                                                                                \[m
+[31m-  BINARY_HANDLER (array_ref, LEFT_SQUARE)                                      \[m
+[32m+[m[32m  BINARY_HANDLER(array_ref, LEFT_SQUARE)                                      \[m
+                                                                                \[m
+[31m-  BINARY_HANDLER (field_ref, DOT)[m
+[32m+[m[32m  BINARY_HANDLER(field_ref, DOT)[m
+ [m
+ #define BINARY_HANDLER(name, _)                                                \[m
+[31m-  Tree binary_##name (const_TokenPtr tok, Tree left);[m
+[32m+[m[32m  Tree binary_##name(const_TokenPtr tok, Tree left);[m
+   BINARY_HANDLER_LIST[m
+ #undef BINARY_HANDLER[m
+ [m
+ public:[m
+[31m-  Parser (Lexer &lexer_) : lexer (lexer_), puts_fn (), printf_fn (), scanf_fn ()[m
+[32m+[m[32m  Parser(Lexer &lexer_) : lexer(lexer_), puts_fn(), printf_fn(), scanf_fn()[m
+   {[m
+   }[m
+ [m
+[31m-  void parse_program ();[m
+[32m+[m[32m  void parse_program();[m
+ [m
+[31m-  Tree parse_statement ();[m
+[32m+[m[32m  Tree parse_statement();[m
+ [m
+[31m-  Tree parse_variable_declaration ();[m
+[31m-  Tree parse_type_declaration ();[m
+[32m+[m[32m  Tree parse_variable_declaration();[m
+[32m+[m[32m  Tree parse_type_declaration();[m
+ [m
+[31m-  Tree parse_type ();[m
+[31m-  Tree parse_record ();[m
+[31m-  Tree parse_field_declaration (std::vector<std::string> &field_names);[m
+[32m+[m[32m  Tree parse_type();[m
+[32m+[m[32m  Tree parse_record();[m
+[32m+[m[32m  Tree parse_field_declaration(std::vector<std::string> &field_names);[m
+ [m
+[31m-  Tree parse_assignment_statement (Tree variable);[m
+[31m-  Tree parse_if_statement ();[m
+[31m-  Tree parse_if_statement (int i);[m
+[31m-  Tree parse_while_statement ();[m
+[31m-  Tree parse_for_statement ();[m
+[31m-  Tree parse_read_statement ();[m
+[31m-  Tree parse_write_statement ();[m
+[32m+[m[32m  Tree parse_assignment_statement(Tree variable);[m
+[32m+[m[32m  Tree parse_if_statement();[m
+[32m+[m[32m  Tree parse_if_statement(Tree variable);[m
+[32m+[m[32m  Tree parse_while_statement();[m
+[32m+[m[32m  Tree parse_for_statement();[m
+[32m+[m[32m  Tree parse_read_statement();[m
+[32m+[m[32m  Tree parse_print_statement();[m
+ [m
+[31m-  Tree parse_expression ();[m
+[32m+[m[32m  Tree parse_expression();[m
+   Tree parse_expression_naming_variable();[m
+   Tree parse_lhs_assignment_expression();[m
+[31m-  Tree parse_boolean_expression ();[m
+[31m-  Tree parse_integer_expression ();[m
+[32m+[m[32m  Tree parse_boolean_expression();[m
+[32m+[m[32m  Tree parse_integer_expression();[m
+ [m
+   /*Tiger*/[m
+[31m-  Tree parse_statement (const_TokenPtr t);[m
+[32m+[m[32m  Tree parse_statement(const_TokenPtr t);[m
+   /*Tiger*/[m
+ private:[m
+   Lexer &lexer;[m
+[36m@@ -237,94 +238,96 @@[m [mprivate:[m
+   std::vector<BlockChain> stack_block_chain;[m
+ };[m
+ [m
+[32m+[m[32mstd::vector<Tree> stmt_stack;[m
+[32m+[m
+ void[m
+[31m-Parser::skip_after_semicolon ()[m
+[32m+[m[32mParser::skip_after_semicolon()[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[31m-  while (t->get_id () != Tiger::END_OF_FILE &&[m
+[31m-         t->get_id () != Tiger::SEMICOLON){[m
+[31m-      lexer.skip_token ();[m
+[31m-      t = lexer.peek_token ();[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+[32m+[m[32m  while(t->get_id() != Tiger::END_OF_FILE &&[m
+[32m+[m[32m         t->get_id() != Tiger::SEMICOLON){[m
+[32m+[m[32m      lexer.skip_token();[m
+[32m+[m[32m      t = lexer.peek_token();[m
+   }[m
+[31m-  if (t->get_id () == Tiger::SEMICOLON)[m
+[31m-    lexer.skip_token ();[m
+[32m+[m[32m  if(t->get_id() == Tiger::SEMICOLON)[m
+[32m+[m[32m    lexer.skip_token();[m
+ }[m
+ void[m
+[31m-Parser::skip_after_semicolon_or_other ()[m
+[32m+[m[32mParser::skip_after_semicolon_or_other()[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+   //printf("skip_after_semicolon_or_other \n");[m
+ [m
+[31m-  while (t->get_id () != Tiger::END_OF_FILE &&[m
+[31m-         t->get_id () != Tiger::SEMICOLON &&[m
+[31m-         t->get_id () != Tiger::IN &&[m
+[31m-         t->get_id () != Tiger::TYPE &&[m
+[31m-         t->get_id () != Tiger::VAR &&[m
+[31m-         t->get_id () != Tiger::FUNCTION){[m
+[31m-      lexer.skip_token ();[m
+[31m-      t = lexer.peek_token ();[m
+[31m-    //  printf("tkn _or_other %s \n", t->get_token_description ());[m
+[32m+[m[32m  while(t->get_id() != Tiger::END_OF_FILE &&[m
+[32m+[m[32m         t->get_id() != Tiger::SEMICOLON &&[m
+[32m+[m[32m         t->get_id() != Tiger::IN &&[m
+[32m+[m[32m         t->get_id() != Tiger::TYPE &&[m
+[32m+[m[32m         t->get_id() != Tiger::VAR &&[m
+[32m+[m[32m         t->get_id() != Tiger::FUNCTION){[m
+[32m+[m[32m      lexer.skip_token();[m
+[32m+[m[32m      t = lexer.peek_token();[m
+[32m+[m[32m    //  printf("tkn _or_other %s \n", t->get_token_description());[m
+ [m
+   }[m
+[31m-  if (t->get_id () == Tiger::SEMICOLON)[m
+[31m-    lexer.skip_token ();[m
+[32m+[m[32m  if(t->get_id() == Tiger::SEMICOLON)[m
+[32m+[m[32m    lexer.skip_token();[m
+ [m
+ }[m
+ void[m
+[31m-Parser::skip_before_new_declaration ()[m
+[32m+[m[32mParser::skip_before_new_declaration()[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+   //printf("skip_before_new_declaration \n");[m
+[31m-  while ([m
+[31m-    t->get_id () != Tiger::END_OF_FILE &&[m
+[31m-    t->get_id () != Tiger::IN &&[m
+[31m-    t->get_id () != Tiger::TYPE &&[m
+[31m-    t->get_id () != Tiger::FUNCTION && [m
+[31m-    t->get_id () != Tiger::VAR)[m
+[32m+[m[32m  while([m
+[32m+[m[32m    t->get_id() != Tiger::END_OF_FILE &&[m
+[32m+[m[32m    t->get_id() != Tiger::IN &&[m
+[32m+[m[32m    t->get_id() != Tiger::TYPE &&[m
+[32m+[m[32m    t->get_id() != Tiger::FUNCTION &&[m[41m [m
+[32m+[m[32m    t->get_id() != Tiger::VAR)[m
+     {[m
+[31m-     // printf("tkn new decl %s \n", t->get_token_description ());[m
+[32m+[m[32m     // printf("tkn new decl %s \n", t->get_token_description());[m
+ [m
+[31m-      lexer.skip_token ();[m
+[31m-      t = lexer.peek_token ();[m
+[32m+[m[32m      lexer.skip_token();[m
+[32m+[m[32m      t = lexer.peek_token();[m
+   }[m
+[31m-  //printf("tkn new decl %s \n", t->get_token_description ());[m
+[32m+[m[32m  //printf("tkn new decl %s \n", t->get_token_description());[m
+ [m
+ [m
+[31m-  /*if (t->get_id () != Tiger::END_OF_FILE)[m
+[31m-    lexer.skip_token ();*/[m
+[32m+[m[32m  /*if(t->get_id() != Tiger::END_OF_FILE)[m
+[32m+[m[32m    lexer.skip_token();*/[m
+ }[m
+ [m
+ void[m
+[31m-Parser::skip_after_end ()[m
+[32m+[m[32mParser::skip_after_end()[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+ [m
+[31m-  while (t->get_id () != Tiger::END_OF_FILE && t->get_id () != Tiger::END)[m
+[32m+[m[32m  while(t->get_id() != Tiger::END_OF_FILE && t->get_id() != Tiger::END)[m
+     {[m
+[31m-      lexer.skip_token ();[m
+[31m-      t = lexer.peek_token ();[m
+[32m+[m[32m      lexer.skip_token();[m
+[32m+[m[32m      t = lexer.peek_token();[m
+     }[m
+ [m
+[31m-  if (t->get_id () == Tiger::END)[m
+[31m-    lexer.skip_token ();[m
+[32m+[m[32m  if(t->get_id() == Tiger::END)[m
+[32m+[m[32m    lexer.skip_token();[m
+ }[m
+ /*[m
+ ===(5)===[m
+ Function expect_token checks the current token.[m
+ If its id is the same as the one we expect, [m
+ it skips and returns it, otherwise it diagnoses [m
+[31m-an error and returns an empty pointer (i.e. a null pointer).[m
+[32m+[m[32man error and returns an empty pointer(i.e. a null pointer).[m
+ */[m
+ const_TokenPtr[m
+[31m-Parser::expect_token (Tiger::TokenId token_id)[m
+[32m+[m[32mParser::expect_token(Tiger::TokenId token_id)[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[31m-  if (t->get_id () == token_id){[m
+[31m-      lexer.skip_token ();[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+[32m+[m[32m  if(t->get_id() == token_id){[m
+[32m+[m[32m      lexer.skip_token();[m
+       return t;[m
+   }else{[m
+[31m-      error_at (t->get_locus (), "expecting %s but %s found\n",get_token_description (token_id), t->get_token_description ());[m
+[31m-      return const_TokenPtr ();[m
+[32m+[m[32m      error_at(t->get_locus(), "expecting %s but %s found\n",get_token_description(token_id), t->get_token_description());[m
+[32m+[m[32m      return const_TokenPtr();[m
+   }[m
+ }[m
+ /*[m
+[36m@@ -332,7 +335,7 @@[m [mParser::expect_token (Tiger::TokenId token_id)[m
+ Here we use a function skip_token that given a token id, [m
+ checks if the current token has that same id. If it has, [m
+ it just skips it and returns true. Otherwise diagnoses an [m
+[31m-error and returns false. When skip_token fails (i.e. returns [m
+[32m+[m[32merror and returns false. When skip_token fails(i.e. returns[m[41m [m
+ false) we immediately go to panic mode and give up parsing [m
+ the current statement.  No wonder there exist tools, [m
+ like ANTLR by Terence Parr, that automate the code generation [m
+[36m@@ -340,90 +343,99 @@[m [mof recursive descent recognizers.[m
+ Function skip_token simply forwards to expect_token.[m
+ */[m
+ bool[m
+[31m-Parser::skip_token (Tiger::TokenId token_id)[m
+[32m+[m[32mParser::skip_token(Tiger::TokenId token_id)[m
+ {[m
+[31m-  return expect_token (token_id) != const_TokenPtr();[m
+[32m+[m[32m  return expect_token(token_id) != const_TokenPtr();[m
+ }[m
+ [m
+ void[m
+[31m-Parser::unexpected_token (const_TokenPtr t)[m
+[32m+[m[32mParser::unexpected_token(const_TokenPtr t)[m
+ {[m
+[31m-  ::error_at (t->get_locus (), "unexpected %s\n", t->get_token_description ());[m
+[32m+[m[32m  ::error_at(t->get_locus(), "unexpected %s\n", t->get_token_description());[m
+ }[m
+ [m
+ void[m
+[31m-Parser::parse_program ()[m
+[32m+[m[32mParser::parse_program()[m
+ {[m
+[31m-  printf("parse_program\n");[m
+[32m+[m[32m  printf("-----parse_program\n");[m
+ [m
+[31m-  // Built type of main "int (int, char**)"[m
+[32m+[m[32m  // Built type of main "int(int, char**)"[m
+   tree main_fndecl_type_param[] = {integer_type_node,/* int */[m
+[31m-                                   build_pointer_type (build_pointer_type (char_type_node)) /* char** */  [m
+[32m+[m[32m                                   build_pointer_type(build_pointer_type(char_type_node)) /* char** */[m[41m  [m
+                                   };[m
+[31m-  tree main_fndecl_type = build_function_type_array (integer_type_node, 2, main_fndecl_type_param);[m
+[32m+[m[32m  tree main_fndecl_type = build_function_type_array(integer_type_node, 2, main_fndecl_type_param);[m
+   // Create function declaration "int main(int, char**)"[m
+[31m-  main_fndecl = build_fn_decl ("main", main_fndecl_type);[m
+[32m+[m[32m  main_fndecl = build_fn_decl("main", main_fndecl_type);[m
+ [m
+   // Enter top level scope[m
+[31m-  enter_scope ();[m
+[32m+[m[32m  enter_scope();[m
+   // program -> statement*[m
+[31m-  parse_statement_seq (&Parser::done_end_of_file);[m
+[32m+[m[32m  parse_statement_seq(&Parser::done_end_of_file);[m
+[32m+[m[32m  //stmt_stack.pop_back();[m
+   // Append "return 0;"[m
+[31m-  tree resdecl = build_decl (UNKNOWN_LOCATION, RESULT_DECL, NULL_TREE, integer_type_node);[m
+[31m-  DECL_CONTEXT (resdecl) = main_fndecl;[m
+[31m-  DECL_RESULT (main_fndecl) = resdecl;[m
+[31m-  tree set_result = build2 (INIT_EXPR, void_type_node, DECL_RESULT (main_fndecl),build_int_cst_type (integer_type_node, 0));[m
+[31m-  tree return_stmt = build1 (RETURN_EXPR, void_type_node, set_result);[m
+[32m+[m[32m  tree resdecl = build_decl(UNKNOWN_LOCATION, RESULT_DECL, NULL_TREE, integer_type_node);[m
+[32m+[m[32m  DECL_CONTEXT(resdecl) = main_fndecl;[m
+[32m+[m[32m  DECL_RESULT(main_fndecl) = resdecl;[m
+[32m+[m[32m  tree set_result = build2(INIT_EXPR, void_type_node, DECL_RESULT(main_fndecl),build_int_cst_type(integer_type_node, 0));[m
+[32m+[m[32m  tree return_stmt = build1(RETURN_EXPR, void_type_node, set_result);[m
+ [m
+[31m-  get_current_stmt_list ().append (return_stmt);[m
+[32m+[m[32m  get_current_stmt_list().append(return_stmt);[m
+ [m
+   // Leave top level scope, get its binding expression and its main block[m
+[31m-  TreeSymbolMapping main_tree_scope = leave_scope ();[m
+[32m+[m[32m  TreeSymbolMapping main_tree_scope = leave_scope();[m
+   Tree main_block = main_tree_scope.block;[m
+ [m
+   // Finish main function[m
+[31m-  BLOCK_SUPERCONTEXT (main_block.get_tree ()) = main_fndecl;[m
+[31m-  DECL_INITIAL (main_fndecl) = main_block.get_tree ();[m
+[31m-  DECL_SAVED_TREE (main_fndecl) = main_tree_scope.bind_expr.get_tree ();[m
+[32m+[m[32m  BLOCK_SUPERCONTEXT(main_block.get_tree()) = main_fndecl;[m
+[32m+[m[32m  DECL_INITIAL(main_fndecl) = main_block.get_tree();[m
+[32m+[m[32m  DECL_SAVED_TREE(main_fndecl) = main_tree_scope.bind_expr.get_tree();[m
+ [m
+[31m-  DECL_EXTERNAL (main_fndecl) = 0;[m
+[31m-  DECL_PRESERVE_P (main_fndecl) = 1;[m
+[32m+[m[32m  DECL_EXTERNAL(main_fndecl) = 0;[m
+[32m+[m[32m  DECL_PRESERVE_P(main_fndecl) = 1;[m
+ [m
+   // Convert from GENERIC to GIMPLE[m
+[31m-  gimplify_function_tree (main_fndecl);[m
+[32m+[m[32m  gimplify_function_tree(main_fndecl);[m
+ [m
+   // Insert it into the graph[m
+[31m-  cgraph_node::finalize_function (main_fndecl, true);[m
+[32m+[m[32m  cgraph_node::finalize_function(main_fndecl, true);[m
+ [m
+   main_fndecl = NULL_TREE;[m
+ }[m
+ [m
+ bool[m
+[31m-Parser::done_end_of_file ()[m
+[32m+[m[32mParser::done_end_of_file()[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[31m-  return (t->get_id () == Tiger::END_OF_FILE);[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+[32m+[m[32m  return(t->get_id() == Tiger::END_OF_FILE);[m
+ }[m
+ [m
+ bool[m
+[31m-Parser::done_end ()[m
+[32m+[m[32mParser::done_end()[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[31m-  return (t->get_id () == Tiger::END || t->get_id () == Tiger::END_OF_FILE);[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+[32m+[m[32m  //return(t->get_id() == Tiger::END || t->get_id() == Tiger::END_OF_FILE || t->get_id () == Tiger::RIGHT_PAREN );[m
+[32m+[m[32m  return(t->get_id() == Tiger::END || t->get_id() == Tiger::END_OF_FILE);[m
+ }[m
+ [m
+ bool[m
+[31m-Parser::done_end_or_else ()[m
+[32m+[m[32mParser::done_end_or_else()[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[31m-  return (t->get_id () == Tiger::END || t->get_id () == Tiger::ELSE || t->get_id () == Tiger::END_OF_FILE);[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+[32m+[m[32m  //return(t->get_id() == Tiger::END || t->get_id() == Tiger::ELSE || t->get_id() == Tiger::END_OF_FILE || t->get_id () == Tiger::RIGHT_PAREN);[m
+[32m+[m[32m  return(t->get_id() == Tiger::END || t->get_id() == Tiger::ELSE || t->get_id() == Tiger::END_OF_FILE);[m
+ }[m
+ /*Tiger*/[m
+ bool[m
+[31m-Parser::done_in ()[m
+[32m+[m[32mParser::done_in()[m
+[32m+[m[32m{[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+[32m+[m[32m  return(t->get_id() == Tiger::IN || t->get_id() == Tiger::END_OF_FILE);[m
+[32m+[m[32m}[m
+[32m+[m[32mbool[m
+[32m+[m[32mParser::done_right_paren()[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[31m-  return (t->get_id () == Tiger::IN || t->get_id () == Tiger::END_OF_FILE);[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+[32m+[m[32m  return(t->get_id() == Tiger::RIGHT_PAREN || t->get_id() == Tiger::END_OF_FILE);[m
+ }[m
+ /*Tiger*/[m
+ [m
+[36m@@ -431,76 +443,84 @@[m [mParser::done_in ()[m
+ ===(1)===[m
+ This is fine but if you check the syntax of tiny, you will see that the condition [m
+ of finalization of a 〈statement-seq〉 is not always the end of file. Sometimes[m
+[31m-can be end (in the then or else part of an if statement, int the body for statement[m
+[31m-and in the body of a while statement) and sometimes is else (in the then part [m
+[32m+[m[32mcan be end(in the then or else part of an if statement, int the body for statement[m
+[32m+[m[32mand in the body of a while statement) and sometimes is else(in the then part[m[41m [m
+ of an if statement). So this means that parse_statement_seq can be reused if[m
+ we parameterize the finalization condition. Something like this.[m
+ *done pode ser done_end_of_file, etc[m
+ */[m
+ void[m
+[31m-Parser::parse_statement_seq (bool (Parser::*done) ())[m
+[32m+[m[32mParser::parse_statement_seq(bool(Parser::*done)())[m
+ {[m
+[31m-  printf("parse_statement_seq\n");[m
+[31m-[m
+[32m+[m[32m  printf("-----parse_statement_seq\n");[m
+[32m+[m[32m  Tree stmt;[m
+   // Parse statements until done and append to the current stmt list;[m
+[31m-  while (!(this->*done) ())[m
+[32m+[m[32m  while(!(this->*done)())[m
+     {[m
+[31m-      //Tree stmt = parse_statement ();[m
+[31m-      Tree stmt = parse_expression ();[m
+[31m-      //printf("STMT de parse_statement do tipo %s stmt \n",print_type (stmt.get_type ()));[m
+[31m-      get_current_stmt_list ().append (stmt);[m
+[31m-      get_current_stmt_list ().set_tipo(stmt.get_type ());[m
+[32m+[m[32m      //Tree stmt = parse_statement();[m
+[32m+[m[32m      const_TokenPtr tok = lexer.peek_token();[m
+[32m+[m[32m      /*printf("TOKEN parse_statement_seq[1]->  %s \n", tok->get_token_description());[m
+[32m+[m[32m      if(tok->get_id() == TIGER::IF){ }*/[m
+[32m+[m[32m      stmt = parse_expression();[m
+[32m+[m[32m      //printf("STMT de parse_statement do tipo %s stmt \n",print_type(stmt.get_type()));[m
+[32m+[m[32m      get_current_stmt_list().append(stmt);[m
+[32m+[m[32m      get_current_stmt_list().set_tipo(stmt.get_type());[m[41m      [m
+[32m+[m[32m      tok = lexer.peek_token();[m
+[32m+[m[32m      if(tok->get_id() == Tiger::SEMICOLON){[m
+[32m+[m[32m          lexer.skip_token();[m
+[32m+[m[32m      }[m
+     }[m
+[31m-    printf("Ultimo current_stmt_list do tipo %s \n ",print_type (get_current_stmt_list ().get_tipo ()));[m
+[32m+[m[32m    stmt_stack.push_back(stmt);[m
+[32m+[m[32m    //printf("Ultimo current_stmt_list do tipo %s \n ",print_type(get_current_stmt_list().get_tipo()));[m
+ }[m
+ void[m
+[31m-Parser::parse_let_declaration_seq (bool (Parser::*done) ())[m
+[32m+[m[32mParser::parse_let_declaration_seq(bool(Parser::*done)())[m
+ {[m
+[31m-  while (!(this->*done) ())[m
+[32m+[m[32m  while(!(this->*done)())[m
+     {[m
+[31m-      Tree stmt = parse_declaration_let ();[m
+[31m-      get_current_stmt_list ().append (stmt);[m
+[32m+[m[32m      Tree stmt = parse_declaration_let();[m
+[32m+[m[32m      get_current_stmt_list().append(stmt);[m
+     }[m
+ }[m
+ [m
+ void[m
+[31m-Parser::enter_scope ()[m
+[32m+[m[32mParser::enter_scope()[m
+ {[m
+[31m-  scope.push_scope ();[m
+[32m+[m[32m  scope.push_scope();[m
+ [m
+   TreeStmtList stmt_list;[m
+[31m-  stack_stmt_list.push_back (stmt_list);[m
+[32m+[m[32m  stack_stmt_list.push_back(stmt_list);[m
+ [m
+[31m-  stack_var_decl_chain.push_back (TreeChain ());[m
+[31m-  stack_block_chain.push_back (BlockChain ());[m
+[32m+[m[32m  stack_var_decl_chain.push_back(TreeChain());[m
+[32m+[m[32m  stack_block_chain.push_back(BlockChain());[m
+ }[m
+ [m
+ Parser::TreeSymbolMapping[m
+[31m-Parser::leave_scope ()[m
+[32m+[m[32mParser::leave_scope()[m
+ {[m
+[31m-  TreeStmtList current_stmt_list = get_current_stmt_list ();[m
+[31m-  stack_stmt_list.pop_back ();[m
+[32m+[m[32m  TreeStmtList current_stmt_list = get_current_stmt_list();[m
+[32m+[m[32m  stack_stmt_list.pop_back();[m
+ [m
+[31m-  TreeChain var_decl_chain = stack_var_decl_chain.back ();[m
+[31m-  stack_var_decl_chain.pop_back ();[m
+[32m+[m[32m  TreeChain var_decl_chain = stack_var_decl_chain.back();[m
+[32m+[m[32m  stack_var_decl_chain.pop_back();[m
+ [m
+[31m-  BlockChain subblocks = stack_block_chain.back ();[m
+[31m-  stack_block_chain.pop_back ();[m
+[32m+[m[32m  BlockChain subblocks = stack_block_chain.back();[m
+[32m+[m[32m  stack_block_chain.pop_back();[m
+ [m
+[31m-  tree new_block = build_block (var_decl_chain.first.get_tree (), subblocks.first.get_tree (), /* supercontext */ NULL_TREE, /* chain */ NULL_TREE);[m
+[32m+[m[32m  tree new_block = build_block(var_decl_chain.first.get_tree(), subblocks.first.get_tree(), /* supercontext */ NULL_TREE, /* chain */ NULL_TREE);[m
+ [m
+[31m-  // Add the new block to the current chain of blocks (if any)[m
+[31m-  if (!stack_block_chain.empty ())[m
+[32m+[m[32m  // Add the new block to the current chain of blocks(if any)[m
+[32m+[m[32m  if(!stack_block_chain.empty())[m
+     {[m
+[31m-      stack_block_chain.back ().append (new_block);[m
+[32m+[m[32m      stack_block_chain.back().append(new_block);[m
+     }[m
+ [m
+   // Set the subblocks to have the new block as their parent[m
+[31m-  for (tree it = subblocks.first.get_tree (); it != NULL_TREE;[m
+[31m-       it = BLOCK_CHAIN (it))[m
+[31m-    BLOCK_SUPERCONTEXT (it) = new_block;[m
+[32m+[m[32m  for(tree it = subblocks.first.get_tree(); it != NULL_TREE;[m
+[32m+[m[32m       it = BLOCK_CHAIN(it))[m
+[32m+[m[32m    BLOCK_SUPERCONTEXT(it) = new_block;[m
+ [m
+[31m-  tree bind_expr = build3 (BIND_EXPR, void_type_node, var_decl_chain.first.get_tree (), current_stmt_list.get_tree (), new_block);[m
+[32m+[m[32m  tree bind_expr = build3(BIND_EXPR, void_type_node, var_decl_chain.first.get_tree(), current_stmt_list.get_tree(), new_block);[m
+ [m
+   TreeSymbolMapping tree_scope;[m
+   tree_scope.bind_expr = bind_expr;[m
+[36m@@ -512,9 +532,9 @@[m [mParser::leave_scope ()[m
+ }[m
+ [m
+ TreeStmtList &[m
+[31m-Parser::get_current_stmt_list ()[m
+[32m+[m[32mParser::get_current_stmt_list()[m
+ {[m
+[31m-  return stack_stmt_list.back ();[m
+[32m+[m[32m  return stack_stmt_list.back();[m
+ }[m
+ [m
+ [m
+[36m@@ -528,14 +548,14 @@[m [mtoken. We do some minimal error recovery by skiping[m
+ all tokens until a semicolon is found.[m
+ */[m
+ Tree[m
+[31m-Parser::parse_statement ()[m
+[32m+[m[32mParser::parse_statement()[m
+ {[m
+[31m-  const_TokenPtr t = lexer.peek_token ();[m
+[32m+[m[32m  const_TokenPtr t = lexer.peek_token();[m
+ [m
+[31m-  return parse_statement (t);[m
+[32m+[m[32m  return parse_statement(t);[m
+ }[m
+   Tree[m
+[31m-Parser::parse_statement (const_TokenPtr t)[m
+[32m+[m[32mParser::parse_statement(const_TokenPtr t)[m
+ {[m
+ [m
+   /*[m
+[36m@@ -545,58 +565,59 @@[m [mParser::parse_statement (const_TokenPtr t)[m
+ 	   |  while_statement[m
+ 	   |  for_statement[m
+ 	   |  read_statement[m
+[31m-	   |  write_statement[m
+[32m+[m	[32m   |  print_statement[m
+ 	   */[m
+[31m-  printf("parse_statement\n");[m
+[31m-  printf("---tkn  %s\n", t->get_token_description ());[m
+[31m-  switch (t->get_id ())[m
+[32m+[m[32m  printf("-----parse_statement\n");[m
+[32m+[m[32m  printf("_____tkn(parse)  %s\n", t->get_token_description());[m
+[32m+[m[32m  switch(t->get_id())[m
+     {[m
+    /* case Tiger::VAR:[m
+[31m-      return parse_variable_declaration ();[m
+[32m+[m[32m      return parse_variable_declaration();[m
+       break;[m
+     case Tiger::TYPE:[m
+[31m-      return parse_type_declaration ();[m
+[32m+[m[32m      return parse_type_declaration();[m
+       break;[m
+       */[m
+     case Tiger::IF:[m
+[31m-      return parse_if_statement ();[m
+[32m+[m[32m      return parse_if_statement();[m
+       break;[m
+     case Tiger::WHILE:[m
+[31m-      return parse_while_statement ();[m
+[32m+[m[32m      return parse_while_statement();[m
+       break;[m
+     case Tiger::FOR:[m
+[31m-      return parse_for_statement ();[m
+[32m+[m[32m      return parse_for_statement();[m
+       break;[m
+     case Tiger::READ:[m
+[31m-      return parse_read_statement ();[m
+[32m+[m[32m      return parse_read_statement();[m
+       break;[m
+[31m-    case Tiger::WRITE:[m
+[31m-      return parse_write_statement ();[m
+[32m+[m[32m    case Tiger::PRINT:[m
+[32m+[m[32m      return parse_print_statement();[m
+       break;[m
+       /*[m
+     case Tiger::IDENTIFIER:[m
+[31m-      return parse_assignment_statement ();[m
+[32m+[m[32m      return parse_assignment_statement();[m
+       break;[m
+       */[m
+     /*Tiger*/[m
+     case Tiger::LET:[m
+[31m-      return parse_let_statement ();[m
+[32m+[m[32m      return parse_let_statement();[m
+       break;[m
+       /*[m
+   assignment e literal devem retornar valores[m
+         */[m
+[32m+[m[32m      /*[m
+     case Tiger::INTEGER_LITERAL:[m
+     case Tiger::STRING_LITERAL:[m
+     case Tiger::FLOAT_LITERAL:[m
+     case Tiger::LEFT_PAREN:[m
+[31m-      return parse_literal_statement ();[m
+[32m+[m[32m      return parse_literal_statement();[m
+       break;[m
+[31m-  [m
+[32m+[m[32m*/[m[41m  [m
+     /*Tiger*/[m
+     default:[m
+[31m-      unexpected_token (t);[m
+[31m-      skip_after_semicolon_or_other ();[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m      unexpected_token(t);[m
+[32m+[m[32m      skip_after_semicolon_or_other();[m
+[32m+[m[32m      return Tree::error();[m
+       break;[m
+       /*      [m
+       //return null_denotation(t);[m
+[36m@@ -605,33 +626,54 @@[m [mParser::parse_statement (const_TokenPtr t)[m
+       */[m
+     }[m
+ [m
+[31m-  gcc_unreachable ();[m
+[32m+[m[32m  gcc_unreachable();[m
+ }[m
+ Tree[m
+[31m-Parser::parse_declaration_let ()[m
+[32m+[m[32mParser::parse_declaration_let()[m
+ {[m
+[31m- printf("parse_declaration_let\n");[m
+[31m- const_TokenPtr t = lexer.peek_token ();[m
+[31m- switch (t->get_id ())[m
+[32m+[m[32m printf("-----parse_declaration_let\n");[m
+[32m+[m
+[32m+[m[32m const_TokenPtr t = lexer.peek_token();[m
+[32m+[m[32m switch(t->get_id())[m
+     {[m
+     case Tiger::VAR:[m
+[31m-      return parse_variable_declaration ();[m
+[32m+[m[32m      return parse_variable_declaration();[m
+       break;[m
+     case Tiger::TYPE:[m
+[31m-      return parse_type_declaration ();[m
+[32m+[m[32m      return parse_type_declaration();[m
+       break;[m
+     case Tiger::FUNCTION:[m
+[31m-      /*return parse_type_declaration ();*/[m
+[32m+[m[32m      /*return parse_type_declaration();*/[m
+       break;[m
+     default:[m
+[31m-      unexpected_token (t);[m
+[31m-      skip_before_new_declaration ();[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m      unexpected_token(t);[m
+[32m+[m[32m      skip_before_new_declaration();[m
+[32m+[m[32m      return Tree::error();[m
+       break;[m
+     }[m
+[31m-  gcc_unreachable ();[m
+[32m+[m[32m  gcc_unreachable();[m
+ [m
+ }[m
+[32m+[m
+[32m+[m[32m/*[m
+[32m+[m[32mpara diferenciar[m[41m [m
+[32m+[m[32ma:=(1+..)[m[41m [m
+[32m+[m[32mde[m
+[32m+[m[32m(a:=b;b:=b+b;...)[m
+[32m+[m[32m*/[m
+[32m+[m[32mTree[m
+[32m+[m[32mParser::parse_expression()[m
+[32m+[m[32m{[m
+[32m+[m[32m  return parse_expression(/* right_binding_power */ 0,0);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mTree[m
+[32m+[m[32mParser::parse_expression(int first)[m
+[32m+[m[32m{[m
+[32m+[m[32m  return parse_expression(first,0);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+ /*[m
+ ===(6)===[m
+ A Pratt parser defines the concept of binding power as some sort of priority number: the [m
+[36m@@ -644,13 +686,13 @@[m [mwill use the lowest priority possible. Then the parser starts by peeking the[m
+ current token t1 and skipping it. Then it invokes the null denotation function [m
+ of t1. If this token cannot appear at this point then its null denotation [m
+ function will diagnose an error and the parsing will end at this point. [m
+[31m-Otherwise the null denotation function will do something (that may include [m
+[32m+[m[32mOtherwise the null denotation function will do something(that may include[m[41m [m
+ advancing the token stream, more on this later). Once we are back from [m
+ the null denotation, the parser checks if the current right binding power [m
+[31m-is lower or than that of the current token (call it t2, but note that [m
+[32m+[m[32mis lower or than that of the current token(call it t2, but note that[m[41m [m
+ it may not be the next one after t1). If it is not, parsing ends here. [m
+ Otherwise the parser skips the token and the left denotation function is [m
+[31m-invoked on t2. The left denotation function (will do something, including [m
+[32m+[m[32minvoked on t2. The left denotation function(will do something, including[m[41m [m
+ advancing the current token, more on this later). Once we are back from the [m
+ left denotation we will check again if the current token has a higher left [m
+ binding power than the current right binding power and proceed likewise.[m
+[36m@@ -660,27 +702,27 @@[m [msimplicity of this parser at its core.[m
+ */[m
+ // This is a Pratt parser[m
+ Tree[m
+[31m-Parser::parse_expression (int right_binding_power)[m
+[32m+[m[32mParser::parse_expression(int right_binding_power,int assignment_paren)[m
+ {[m
+[31m-  printf("parse_expression\n");[m
+[32m+[m[32m  printf("-----parse_expression\n");[m
+ [m
+[31m-  const_TokenPtr current_token = lexer.peek_token ();[m
+[31m-  lexer.skip_token ();[m
+[32m+[m[32m  const_TokenPtr current_token = lexer.peek_token();[m
+[32m+[m[32m  lexer.skip_token();[m
+ [m
+[31m-  Tree expr = null_denotation (current_token);[m
+[32m+[m[32m  Tree expr = null_denotation(current_token,assignment_paren);[m
+ [m
+[31m-  if (expr.is_error ())[m
+[31m-    return Tree::error ();[m
+[32m+[m[32m  if(expr.is_error())[m
+[32m+[m[32m    return Tree::error();[m
+ [m
+[31m-  while (right_binding_power < left_binding_power (lexer.peek_token ())){[m
+[32m+[m[32m  while(right_binding_power < left_binding_power(lexer.peek_token())){[m
+       current_token = lexer.peek_token();[m
+[31m-      lexer.skip_token ();[m
+[32m+[m[32m      lexer.skip_token();[m
+ [m
+[31m-      expr = left_denotation (current_token, expr);[m
+[31m-      if (expr.is_error ())[m
+[31m-	     return Tree::error ();[m
+[32m+[m[32m      expr = left_denotation(current_token, expr);[m
+[32m+[m[32m      if(expr.is_error())[m
+[32m+[m	[32m     return Tree::error();[m
+   }[m
+[31m-  printf("FIM EXP, TIPO   %s \n ",print_type (expr.get_type ()));[m
+[32m+[m[32m  //printf("FIM EXP, TIPO   %s \n ",print_type(expr.get_type()));[m
+ [m
+   return expr;[m
+ }[m
+[36m@@ -688,24 +730,24 @@[m [mParser::parse_expression (int right_binding_power)[m
+ /*[m
+ ===(7)===[m
+ There is little to do now for identifiers, real, integer and string literals. [m
+[31m-So they trivially return true (lines 6 to 10).[m
+[32m+[m[32mSo they trivially return true(lines 6 to 10).[m
+ [m
+[31m-If the current token is ( (line 11) it means that we have to parse a whole [m
+[31m-expression. So we do by recursively invoking parse_expression (with the lowest [m
+[32m+[m[32mIf the current token is((line 11) it means that we have to parse a whole[m[41m [m
+[32m+[m[32mexpression. So we do by recursively invoking parse_expression(with the lowest[m[41m [m
+ priority possible, as if it were a top-level expression). When we return from [m
+[31m-parse_expression we have to make sure that the current token is ) (line 16).[m
+[32m+[m[32mparse_expression we have to make sure that the current token is )(line 16).[m
+ [m
+[31m-If the current token is +, – or not (lines 18, 24, 30) it means that this is [m
+[32m+[m[32mIf the current token is +, – or not(lines 18, 24, 30) it means that this is[m[41m [m
+ a unary operator. We will invoke parse_expression recursively with the [m
+[31m-appropiate priority for each operand (LBP_UNARY_PLUS, LBP_UNARY_NEG, LBP_LOGICAL_NOT, more on this later).[m
+[32m+[m[32mappropiate priority for each operand(LBP_UNARY_PLUS, LBP_UNARY_NEG, LBP_LOGICAL_NOT, more on this later).[m
+ [m
+ It may not be obvious now, but tok, is not the current token in the input [m
+ stream but the previous one since parse_expression already skipped tok before calling null_denotation.[m
+ */[m
+[31m-// This is invoked when a token (including prefix operands) is found at a[m
+[32m+[m[32m// This is invoked when a token(including prefix operands) is found at a[m
+ // "prefix" position[m
+ Tree[m
+[31m-Parser::null_denotation(const_TokenPtr tok) {[m
+[32m+[m[32mParser::null_denotation(const_TokenPtr tok,int assignment_paren) {[m
+   /*[m
+   Note that using Tree rather than the GENERIC tree is essential for primaries. [m
+   In the code above s->get_tree_decl() returns a tree with the location of the [m
+[36m@@ -715,14 +757,14 @@[m [mParser::null_denotation(const_TokenPtr tok) {[m
+   For literals, the literal itself encodes the value. So the text of the token [m
+   will have to be interpreted as the appropiate value. For integers we can just use atoi.[m
+   */[m
+[31m-  printf("null_denotation\n");[m
+[31m-[m
+[31m-  switch (tok->get_id()) {[m
+[32m+[m[32m  printf("-----null_denotation\n");[m
+[32m+[m[32m  printf("_____tkn(null)  %s\n", tok->get_token_description());[m
+[32m+[m[32m  switch(tok->get_id()) {[m
+   case Tiger::IDENTIFIER:{[m
+       SymbolPtr s = query_variable(tok->get_str(), tok->get_locus());[m
+[31m-      if(lexer.peek_token()->get_id () == Tiger::ASSIG){[m
+[31m-        return parse_assignment_statement (Tree(s->get_tree_decl(), tok->get_locus()));[m
+[31m-      }else if (s == NULL){[m
+[32m+[m[32m      if(lexer.peek_token()->get_id() == Tiger::ASSIG){[m
+[32m+[m[32m        return parse_assignment_statement(Tree(s->get_tree_decl(), tok->get_locus()));[m
+[32m+[m[32m      }else if(s == NULL){[m
+         return Tree::error();[m
+       }else{[m
+         return Tree(s->get_tree_decl(), tok->get_locus());[m
+[36m@@ -734,10 +776,10 @@[m [mParser::null_denotation(const_TokenPtr tok) {[m
+       tok->get_locus());[m
+     break;[m
+     /*[m
+[31m-  For a real literal we have to invoke the (GCC-provided) function real_from_string3 (line 27) [m
+[31m-  to get a real value representation from a string. This function expects the machine (i.e. architecture dependent)[m
+[32m+[m[32m  For a real literal we have to invoke the(GCC-provided) function real_from_string3(line 27)[m[41m [m
+[32m+[m[32m  to get a real value representation from a string. This function expects the machine(i.e. architecture dependent)[m
+   mode of the type, that we can obtain using TYPE_MODE. It returns its value in a REAL_VALUE_TYPE that then can [m
+[31m-  be used to build a real constant tree using the (GCC-provided) function build_real.[m
+[32m+[m[32m  be used to build a real constant tree using the(GCC-provided) function build_real.[m
+       */[m
+   case Tiger::REAL_LITERAL:[m
+     {[m
+[36m@@ -747,9 +789,9 @@[m [mParser::null_denotation(const_TokenPtr tok) {[m
+     }[m
+     break;[m
+   /*[m
+[31m-  To create a string literal we use the (GCC-provided) function build_string_literal. [m
+[32m+[m[32m  To create a string literal we use the(GCC-provided) function build_string_literal.[m[41m [m
+   For practical reasons our string literal will contain the NULL terminator, otherwise [m
+[31m-  the string literal itself will not be useable in C functions (more on this later).[m
+[32m+[m[32m  the string literal itself will not be useable in C functions(more on this later).[m
+ [m
+   While the type GENERIC trees created for integer and real literals was obviously [m
+   integer_type_node and float_type_node, it is not so clear for string literals. [m
+[36m@@ -775,8 +817,48 @@[m [mParser::null_denotation(const_TokenPtr tok) {[m
+       return Tree(build_int_cst_type(boolean_type_node, 0),tok->get_locus());[m
+     }[m
+     break;[m
+[32m+[m[32m    /**/[m
+   case Tiger::LEFT_PAREN:[m
+     {[m
+[32m+[m[32m      printf("LEFT PAREN FOUND, %d\n",assignment_paren);[m
+[32m+[m[32m      if(assignment_paren==0){[m
+[32m+[m[32m        printf("assignment_paren==0\n");[m
+[32m+[m[32m        enter_scope();[m
+[32m+[m[32m        parse_statement_seq(&Parser::done_right_paren);[m
+[32m+[m[32m        Tree last_stmt = stmt_stack.back();stmt_stack.pop_back();[m
+[32m+[m[32m        TreeSymbolMapping tree_scope = leave_scope();[m
+[32m+[m[32m        Tree expr = tree_scope.bind_expr;[m
+[32m+[m[32m       /* printf("LEFT_PAREN, TIPO   %s \n ",print_type(expr.get_type()));[m
+[32m+[m[32m        printf("LEFT_PAREN, TIPO   %s \n ",print_type(last_stmt.get_type()));*/[m
+[32m+[m[32m        if(expr.is_error())[m
+[32m+[m[32m            return Tree::error();[m[41m  [m
+[32m+[m[32m        tok = lexer.peek_token();[m
+[32m+[m[32m        if(tok->get_id() == Tiger::RIGHT_PAREN){[m
+[32m+[m[32m          lexer.skip_token();[m
+[32m+[m[32m        }else{[m
+[32m+[m[32m          error_at(tok->get_locus(), "expecting ) but %s found\n",tok->get_token_description());[m
+[32m+[m[32m        }[m
+[32m+[m[32m        //return Tree(expr, tok->get_locus());[m
+[32m+[m[32m        Tree retorno = Tree(expr, tok->get_locus());[m
+[32m+[m[32m        retorno.set_last_stmt(last_stmt);[m
+[32m+[m[32m        return retorno;[m
+[32m+[m
+[32m+[m[32m      }else{[m
+[32m+[m[32m        printf("assignment_paren==1\n");[m
+[32m+[m[32m        Tree expr = parse_expression();[m
+[32m+[m[32m        tok = lexer.peek_token();[m
+[32m+[m[32m        if (tok->get_id() != Tiger::RIGHT_PAREN)[m
+[32m+[m[32m          error_at(tok->get_locus(), "expecting ) but %s found\n",tok->get_token_description());[m
+[32m+[m[32m        else[m
+[32m+[m[32m          lexer.skip_token();[m
+[32m+[m[32m        Tree retorno = Tree(expr, tok->get_locus());[m
+[32m+[m[32m        retorno.set_last_stmt(expr);[m
+[32m+[m[32m        return retorno;[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }[m
+[32m+[m[32m    /*[m
+[32m+[m[32m   case Tiger::LEFT_PAREN:[m
+[32m+[m[32m    {[m
+       Tree expr = parse_expression();[m
+       tok = lexer.peek_token();[m
+       if (tok->get_id() != Tiger::RIGHT_PAREN)[m
+[36m@@ -785,12 +867,13 @@[m [mParser::null_denotation(const_TokenPtr tok) {[m
+         lexer.skip_token();[m
+       return Tree(expr, tok->get_locus());[m
+     }[m
+[32m+[m[32m    /**/[m
+   case Tiger::PLUS:[m
+     {[m
+       Tree expr = parse_expression(LBP_UNARY_PLUS);[m
+[31m-      if (expr.is_error())[m
+[32m+[m[32m      if(expr.is_error())[m
+         return Tree::error();[m
+[31m-      if (expr.get_type() != integer_type_node || expr.get_type() != float_type_node) {[m
+[32m+[m[32m      if(expr.get_type() != integer_type_node || expr.get_type() != float_type_node) {[m
+         error_at(tok->get_locus(),"operand of unary plus must be int or float but it is %s",print_type(expr.get_type()));[m
+         return Tree::error();[m
+       }[m
+[36m@@ -799,10 +882,10 @@[m [mParser::null_denotation(const_TokenPtr tok) {[m
+   case Tiger::MINUS:[m
+     {[m
+       Tree expr = parse_expression(LBP_UNARY_MINUS);[m
+[31m-      if (expr.is_error())[m
+[32m+[m[32m      if(expr.is_error())[m
+         return Tree::error();[m
+ [m
+[31m-      if (expr.get_type() != integer_type_node || expr.get_type() != float_type_node) {[m
+[32m+[m[32m      if(expr.get_type() != integer_type_node || expr.get_type() != float_type_node) {[m
+         error_at(tok->get_locus(),"operand of unary minus must be int or float but it is %s",print_type(expr.get_type()));[m
+         return Tree::error();[m
+       }[m
+[36m@@ -813,10 +896,10 @@[m [mParser::null_denotation(const_TokenPtr tok) {[m
+   case Tiger::NOT:[m
+     {[m
+       Tree expr = parse_expression(LBP_LOGICAL_NOT);[m
+[31m-      if (expr.is_error())[m
+[32m+[m[32m      if(expr.is_error())[m
+         return Tree::error();[m
+ [m
+[31m-      if (expr.get_type() != boolean_type_node) {[m
+[32m+[m[32m      if(expr.get_type() != boolean_type_node) {[m
+         error_at(tok->get_locus(),"operand of logical not must be a boolean but it is %s",print_type(expr.get_type()));[m
+         return Tree::error();[m
+       }[m
+[36m@@ -832,7 +915,7 @@[m [mParser::null_denotation(const_TokenPtr tok) {[m
+       Tree exp_if = parse_if_statement(1);[m
+       printf("EXP IF TIPO   %s \n ", print_type(exp_if.get_type()));[m
+       return exp_if;[m
+[31m-      //return Tree (parse_if_statement (1),tok->get_locus ());[m
+[32m+[m[32m      //return Tree(parse_if_statement(1),tok->get_locus());[m
+     }[m
+     */[m
+     //Tiger[m
+[36m@@ -848,20 +931,20 @@[m [mParser::null_denotation(const_TokenPtr tok) {[m
+ /*[m
+ We first parse the syntactic elements of a variable declaration. We skip the initial var in lines 4 to 8. [m
+ In line 10 we keep the identifier token because it will be used later. We skip the colon in lines 17 to 21. [m
+[31m-In line 23 we parse the type (by calling parse_type, more on this later) and finally in line 31 we skip the semicolon.[m
+[32m+[m[32mIn line 23 we parse the type(by calling parse_type, more on this later) and finally in line 31 we skip the semicolon.[m
+ [m
+ Now the semantic checks of a variable declaration can start. In line 33, we check if the current mapping [m
+ of the scope already contains a mapping for the identifier. If there is such a mapping, this is an error [m
+[31m-and we give up, otherwise we create a new symbol (line 39) using the given identifier and we insert it [m
+[31m-into the current mapping (line 40).[m
+[32m+[m[32mand we give up, otherwise we create a new symbol(line 39) using the given identifier and we insert it[m[41m [m
+[32m+[m[32minto the current mapping(line 40).[m
+ [m
+[31m-Now we need to create some GENERIC for this new variable declaration (line 43). It will have a tree [m
+[32m+[m[32mNow we need to create some GENERIC for this new variable declaration(line 43). It will have a tree[m[41m [m
+ code of VAR_DECL. The first operand of that tree is an IDENTIFIER_NODE for the identifier itself. [m
+ These trees are shared in GENERIC: two identical identifiers will use the same tree. For this reason [m
+ we need to request an IDENTIFIER_NODE rather than creating it manually. We do that calling the [m
+[31m-(GCC-provided) function get_identifier (line 44). The second operand that we will need is the type [m
+[32m+[m[32m(GCC-provided) function get_identifier(line 44). The second operand that we will need is the type[m[41m [m
+ of the declaration. This was obtained in an earlier call to parse_type. Note that we are calling [m
+[31m-the (GCC-provided) function build_decl. This is so because there is an extra step (setting some [m
+[32m+[m[32mthe(GCC-provided) function build_decl. This is so because there is an extra step(setting some[m[41m [m
+ internal type and operation mode of the declaration) that has to be performed for a VAR_DECL. [m
+ Function build_decl takes care of that for us and it is in practice like calling build2_loc.[m
+ [m
+[36m@@ -880,97 +963,97 @@[m [mlater when we talk about blocks.[m
+   var n : int;[m
+ */[m
+ Tree[m
+[31m-Parser::parse_variable_declaration (){[m
+[31m- printf("parse_variable_declaration\n");[m
+[32m+[m[32mParser::parse_variable_declaration(){[m
+[32m+[m[32m printf("-----parse_variable_declaration\n");[m
+ [m
+   Tree type_tree;[m
+   Tree expr;[m
+   const_TokenPtr first_of_expr;[m
+   const_TokenPtr assig_tok;[m
+   // variable_declaration -> "var" identifier ":" type ";"[m
+[31m-  if (!skip_token (Tiger::VAR))[m
+[32m+[m[32m  if(!skip_token(Tiger::VAR))[m
+     {[m
+[31m-      skip_before_new_declaration ();[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m      skip_before_new_declaration();[m
+[32m+[m[32m      return Tree::error();[m
+     }[m
+[31m-  const_TokenPtr identifier = expect_token (Tiger::IDENTIFIER);[m
+[31m-  if (identifier == NULL){[m
+[31m-      skip_before_new_declaration ();[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m  const_TokenPtr identifier = expect_token(Tiger::IDENTIFIER);[m
+[32m+[m[32m  if(identifier == NULL){[m
+[32m+[m[32m      skip_before_new_declaration();[m
+[32m+[m[32m      return Tree::error();[m
+   }[m
+ [m
+[31m-  const_TokenPtr tok = lexer.peek_token ();[m
+[31m-  if (tok->get_id () == Tiger::COLON){[m
+[31m-    skip_token (Tiger::COLON);[m
+[31m-    type_tree = parse_type (); [m
+[31m-    if (type_tree.is_error ()){[m
+[32m+[m[32m  const_TokenPtr tok = lexer.peek_token();[m
+[32m+[m[32m  if(tok->get_id() == Tiger::COLON){[m
+[32m+[m[32m    skip_token(Tiger::COLON);[m
+[32m+[m[32m    type_tree = parse_type();[m[41m [m
+[32m+[m[32m    if(type_tree.is_error()){[m
+       skip_before_new_declaration();[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m      return Tree::error();[m
+     }    [m
+[31m-    assig_tok = expect_token (Tiger::ASSIG);[m
+[31m-    if (assig_tok == NULL){//var a :int:=[m
+[31m-        skip_before_new_declaration ();[m
+[31m-        return Tree::error ();[m
+[32m+[m[32m    assig_tok = expect_token(Tiger::ASSIG);[m
+[32m+[m[32m    if(assig_tok == NULL){//var a :int:=[m
+[32m+[m[32m        skip_before_new_declaration();[m
+[32m+[m[32m        return Tree::error();[m
+     }[m
+[31m-    first_of_expr = lexer.peek_token ();[m
+[31m-    expr = parse_expression ();[m
+[31m-    if (expr.is_error ())[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m    first_of_expr = lexer.peek_token();[m
+[32m+[m[32m    //printf("TOKEN ASSIGN[1]->  %s \n", first_of_expr->get_token_description());[m
+[32m+[m[32m    expr = parse_expression(0,1);[m
+[32m+[m[32m    if(expr.is_error())[m
+[32m+[m[32m      return Tree::error();[m
+ [m
+   }else{[m
+[31m-    assig_tok = expect_token (Tiger::ASSIG);[m
+[31m-    if (assig_tok == NULL){[m
+[31m-        skip_before_new_declaration ();[m
+[31m-        return Tree::error ();[m
+[32m+[m[32m    assig_tok = expect_token(Tiger::ASSIG);[m
+[32m+[m[32m    if(assig_tok == NULL){[m
+[32m+[m[32m        skip_before_new_declaration();[m
+[32m+[m[32m        return Tree::error();[m
+     }   [m
+[31m-    if (type_tree.is_error ()){[m
+[31m-      skip_before_new_declaration();[m
+[31m-      return Tree::error ();[m
+[31m-    }    [m
+[31m-    first_of_expr = lexer.peek_token ();[m
+[31m-    expr = parse_expression ();[m
+[31m-    if (expr.is_error ())[m
+[31m-      return Tree::error ();[m
+[31m-  //fiz aqui, gettype para var a :=1;[m
+[32m+[m[41m      [m
+[32m+[m[32m    first_of_expr = lexer.peek_token();[m
+[32m+[m[32m    expr = parse_expression(0,1);[m
+[32m+[m[32m    if(expr.is_error())[m
+[32m+[m[32m      return Tree::error();[m
+   	type_tree = expr.get_type(); [m
+[31m-    [m
+[32m+[m[32m    if(type_tree.is_error()){[m
+[32m+[m[32m      skip_before_new_declaration();[m
+[32m+[m[32m      return Tree::error();[m
+[32m+[m[32m    }[m[41m [m
+   }[m
+ [m
+[31m-  //skip_token (Tiger::SEMICOLON);[m
+[32m+[m[32m  //skip_token(Tiger::SEMICOLON);[m
+ [m
+[31m-  if (scope.get_current_mapping ().get (identifier->get_str ())){[m
+[31m-      error_at (identifier->get_locus (),"name '%s' already declared in this scope",identifier->get_str ().c_str ());[m
+[32m+[m[32m  if(scope.get_current_mapping().get(identifier->get_str())){[m
+[32m+[m[32m      error_at(identifier->get_locus(),"name '%s' already declared in this scope",identifier->get_str().c_str());[m
+   }[m
+[31m-  SymbolPtr sym (new Symbol (Tiger::VARIABLE, identifier->get_str ()));[m
+[31m-  scope.get_current_mapping ().insert (sym);[m
+[32m+[m[32m  SymbolPtr sym(new Symbol(Tiger::VARIABLE, identifier->get_str()));[m
+[32m+[m[32m  scope.get_current_mapping().insert(sym);[m
+ [m
+[31m-  Tree decl = build_decl (identifier->get_locus (),[m
+[32m+[m[32m  Tree decl = build_decl(identifier->get_locus(),[m
+                           VAR_DECL,[m
+[31m-			                    get_identifier (sym->get_name ().c_str ()),[m
+[31m-			                    type_tree.get_tree ());[m
+[32m+[m			[32m                    get_identifier(sym->get_name().c_str()),[m
+[32m+[m			[32m                    type_tree.get_tree());[m
+ [m
+[31m-  DECL_CONTEXT (decl.get_tree()) = main_fndecl;[m
+[32m+[m[32m  DECL_CONTEXT(decl.get_tree()) = main_fndecl;[m
+ [m
+[31m-  gcc_assert (!stack_var_decl_chain.empty ());[m
+[31m-  stack_var_decl_chain.back ().append (decl);[m
+[32m+[m[32m  gcc_assert(!stack_var_decl_chain.empty());[m
+[32m+[m[32m  stack_var_decl_chain.back().append(decl);[m
+ [m
+[31m-  sym->set_tree_decl (decl);[m
+[32m+[m[32m  sym->set_tree_decl(decl);[m
+   [m
+[31m-  if (decl.get_type () != expr.get_type ()){[m
+[31m-      error_at (first_of_expr->get_locus (),"cannot assign value of type %s to variable '%s' of type %s",                print_type (expr.get_type ()),                sym->get_name ().c_str (),                print_type (decl.get_type ()));[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m  if(decl.get_type() != expr.get_type()){[m
+[32m+[m[32m      error_at(first_of_expr->get_locus(),"cannot assign value of type %s to variable '%s' of type %s",                print_type(expr.get_type()),                sym->get_name().c_str(),                print_type(decl.get_type()));[m
+[32m+[m[32m      return Tree::error();[m
+  }[m
+ [m
+[31m-  //Tree stmt = build_tree (DECL_EXPR, identifier->get_locus (), void_type_node, decl);[m
+[32m+[m[32m  //Tree stmt = build_tree(DECL_EXPR, identifier->get_locus(), void_type_node, decl);[m
+ [m
+   /*nao estava dando, sive que recuperar o simbolo novamente*/[m
+[31m-  sym = query_variable (identifier->get_str (), identifier->get_locus ());[m
+[32m+[m[32m  sym = query_variable(identifier->get_str(), identifier->get_locus());[m
+ [m
+[31m-  gcc_assert (!sym->get_tree_decl ().is_null ());[m
+[32m+[m[32m  gcc_assert(!sym->get_tree_decl().is_null());[m
+ [m
+[31m-  Tree var_decl = sym->get_tree_decl ();[m
+[32m+[m[32m  Tree var_decl = sym->get_tree_decl();[m
+ [m
+[31m-  Tree assig_expr = build_tree (MODIFY_EXPR, assig_tok->get_locus (), void_type_node, var_decl, expr);[m
+[32m+[m[32m  Tree assig_expr = build_tree(MODIFY_EXPR, assig_tok->get_locus(), void_type_node, var_decl, expr);[m
+ [m
+   return assig_expr;[m
+ }[m
+[36m@@ -978,58 +1061,58 @@[m [mParser::parse_variable_declaration (){[m
+ [m
+ [m
+ Tree[m
+[31m-Parser::parse_type_declaration ()[m
+[32m+[m[32mParser::parse_type_declaration()[m
+ {[m
+   // type_declaration -> "type" identifier ":" type ";"[m
+[31m-  if (!skip_token (Tiger::TYPE))[m
+[32m+[m[32m  if(!skip_token(Tiger::TYPE))[m
+     {[m
+[31m-      skip_after_semicolon_or_other ();[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m      skip_after_semicolon_or_other();[m
+[32m+[m[32m      return Tree::error();[m
+     }[m
+ [m
+[31m-  const_TokenPtr identifier = expect_token (Tiger::IDENTIFIER);[m
+[31m-  if (identifier == NULL)[m
+[32m+[m[32m  const_TokenPtr identifier = expect_token(Tiger::IDENTIFIER);[m
+[32m+[m[32m  if(identifier == NULL)[m
+     {[m
+[31m-      skip_after_semicolon_or_other ();[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m      skip_after_semicolon_or_other();[m
+[32m+[m[32m      return Tree::error();[m
+     }[m
+ [m
+[31m-  if (!skip_token (Tiger::COLON))[m
+[32m+[m[32m  if(!skip_token(Tiger::COLON))[m
+     {[m
+[31m-      skip_after_semicolon_or_other ();[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m      skip_after_semicolon_or_other();[m
+[32m+[m[32m      return Tree::error();[m
+     }[m
+ [m
+[31m-  Tree type_tree = parse_type ();[m
+[32m+[m[32m  Tree type_tree = parse_type();[m
+ [m
+[31m-  if (type_tree.is_error ())[m
+[32m+[m[32m  if(type_tree.is_error())[m
+     {[m
+       skip_after_semicolon_or_other();[m
+[31m-      return Tree::error ();[m
+[32m+[m[32m      return Tree::error();[m
+     }[m
+ [m
+[31m-  skip_token (Tiger::SEMICOLON);[m
+[32m+[m[32m  //skip_token(Tiger::SEMICOLON);[m
+ [m
+[31m-  if (scope.get_current_mapping ().get (identifier->get_str ()))[m
+[32m+[m[32m  if(scope.get_current_mapping().get(identifier->get_str()))[m
+   {[m
+[31m-    error_at (identifier->get_locus (),[m
+[32m+[m[32m    error_at(identifier->get_locus(),[m
+ 	            "name '%s' already declared in this scope",[m
+[31m-	            identifier->get_str ().c_str ());[m
+[32m+[m	[32m            identifier->get_str().c_str());[m
+   }[m
+[31m-  SymbolPtr sym (new Symbol (Tiger::TYPENAME, identifier->get_str ()));[m
+[31m-  scope.get_current_mapping ().insert (sym);[m
+[32m+[m[32m  SymbolPtr sym(new Symbol(Tiger::TYPENAME, identifier->get_str()));[m
+[32m+[m[32m  scope.get_current_mapping().insert(sym);[m
+ [m
+[31m-  Tree decl = build_decl (identifier->get_locus (), TYPE_DECL,[m
+[31m-                  			  get_identifier (sym->get_name ().c_str ()),[m
+[31m-                  			  type_tree.get_tree ());[m
+[31m-  DECL_CONTEXT (decl.get_tree()) = main_fndecl;[m
+[32m+[m[32m  Tree decl = build_decl(identifier->get_locus(), TYPE_DECL,[m
+[32m+[m[41m                  [m			[32m  get_identifier(sym->get_name().c_str()),[m
+[32m+[m[41m                  [m			[32m  type_tree.get_tree());[m
+[32m+[m[32m  DECL_CONTEXT(decl.get_tree()) = main_fndecl;[m
+ [m
+[31m-  gcc_assert (!stack_var_decl_chain.empty ());[m
+[31m-  stack_var_decl_chain.back ().append (decl);[m
+[32m+[m[32m  gcc_assert(!stack_var_decl_chain.empty());[m
+[32m+[m[32m  stack_var_decl_chain.back().append(decl);[m
+ [m
+[31m-  sym->set_tree_decl (decl);[m
+[32m+[m[32m  sym->set_tree_decl(decl);[m
+ [m
+[31m-  Tree stmt= build_tree (DECL_EXPR, identifier->get_locus (), void_type_node, decl);[m
+[32m+[m[32m  Tree stmt= build_tree(DECL_EXPR, identifier->get_locus(), void_type_node, decl);[m
+ [m
+   return stmt;[m
+ }[m
+[36m@@ -1038,54 +1121,54 @@[m [mnamespace[m
+ {[m
+ [m
+ bool[m
+[31m-is_string_type (Tree type)[m
+[32m+[m[32mis_string_type(Tree type)[m
+ {[m
+[31m-  gcc_assert (TYPE_P (type.get_tree ()));[m
+[31m-  return type.get_tree_code () == POINTER_TYPE && TYPE_MAIN_VARIANT (TREE_TYPE (type.get_tree ())) == char_type_node;[m
+[32m+[m[32m  gcc_assert(TYPE_P(type.get_tree()));[m
+[32m+[m[32m  return type.get_tree_code() == POINTER_TYPE && TYPE_MAIN_VARIANT(TREE_TYPE(type.get_tree())) == char_type_node;[m
+ }[m
+ [m
+ bool[m
+[31m-is_array_type (Tree type)[m
+[32m+[m[32mis_array_type(Tree type)[m
+ {[m
+[31m-  gcc_assert (TYPE_P (type.get_tree ()));[m
+[31m-  return type.get_tree_code () == ARRAY_TYPE;[m
+[32m+[m[32m  gcc_assert(TYPE_P(type.get_tree()));[m
+[32m+[m[32m  return type.get_tree_code() == ARRAY_TYPE;[m
+ }[m
+ [m
+ bool[m
+[31m-is_record_type (Tree type)[m
+[32m+[m[32mis_record_type(Tree type)[m
+ {[m
+[31m-  gcc_assert (TYPE_P (type.get_tree ()));[m
+[31m-  return type.get_tree_code () == RECORD_TYPE;[m
+[32m+[m[32m  gcc_assert(TYPE_P(type.get_tree()));[m
+[32m+[m[32m  return type.get_tree_code() == RECORD_TYPE;[m
+ }[m
+ [m
+ }[m
+ [m
+ const char *[m
+[31m-Parser::print_type (Tree type)[m
+[32m+[m[32mParser::print_type(Tree type)[m
+ {[m
+[31m-  gcc_assert (TYPE_P (type.get_tree ()));[m
+[32m+[m[32m  gcc_assert(TYPE_P(type.get_tree()));[m
+ [m
+[31m-  if (type == void_type_node)[m
+[32m+[m[32m  if(type == void_type_node)[m
+     {[m
+       return "void";[m
+     }[m
+[31m-  else if (type == integer_type_node)[m
+[32m+[m[32m  else if(type == integer_type_node)[m
+     {[m
+       return "int";[m
+     }[m
+[31m-  else if (type == float_type_node)[m
+[32m+[m[32m  else if(type == float_type_node)[m

@@ -27,6 +27,20 @@ COMPILACAO
 ../gcc-install/bin/gcctiger -o for1 ../gcc-src/gcc/tiger/my_folder/tests_tiny/for1.tiger
 ../gcc-install/bin/gcctiger -o var ../gcc-src/gcc/tiger/my_folder/tests_tiny/var.tiger
 
+ifs
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/1-if-false.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/2-then-else-differ.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/3-then-else-differ-aninhado.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/4-then-else-eq-aninhado.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/5-then-else-differ-aninhado-but-eq-aninhado.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/6-if-errado-tipos-diferentes.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/7-if-aninhado-duplo-correto.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/8-if-errado.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/9-if-aninhado-correto-else.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/10-if-true.tiger
+../gcc-install/bin/gcctiger -o if ../gcc-src/gcc/tiger/my_folder/if/11-custon.tiger 
+ifs
+
 
 ip: 10.30.11.19
 usuário: ra67403inf

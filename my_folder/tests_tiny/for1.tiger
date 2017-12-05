@@ -2,6 +2,7 @@ let
    var i:=10
 in
 	(for i := 1 to 50 do
-		write ("loop for");
+		write (i);
+		write ("\n");
 	end)
 end
