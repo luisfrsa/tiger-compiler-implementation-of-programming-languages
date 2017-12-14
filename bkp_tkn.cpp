@@ -58,6 +58,7 @@ MANTENDO FLOAT, BOOL, TRUE E FALSE LITERAL, write (trocar por print)
   TIGER_TOKEN_KEYWORD (DO, "do")                                                \
   TIGER_TOKEN_KEYWORD (ELSE, "else")                                            \
   TIGER_TOKEN_KEYWORD (END, "end")                                              \
+  TIGER_TOKEN_KEYWORD (FALSE_LITERAL, "false")                                  \
   TIGER_TOKEN_KEYWORD (FLOAT, "float")                                          \
   TIGER_TOKEN_KEYWORD (FOR, "for")                                              \
   TIGER_TOKEN_KEYWORD (FUNCTION, "function")                                    \
@@ -76,6 +77,7 @@ MANTENDO FLOAT, BOOL, TRUE E FALSE LITERAL, write (trocar por print)
   TIGER_TOKEN_KEYWORD (STRING, "string")                                        \
   TIGER_TOKEN_KEYWORD (THEN, "then")                                            \
   TIGER_TOKEN_KEYWORD (TO, "to")                                                \
+  TIGER_TOKEN_KEYWORD (TRUE_LITERAL, "true")                                    \
   TIGER_TOKEN_KEYWORD (TYPE, "type")                                            \
   TIGER_TOKEN_KEYWORD (VAR, "var")                                              \
   TIGER_TOKEN_KEYWORD (WHILE, "while")                                          \

@@ -256,7 +256,6 @@ void
 Parser::skip_after_semicolon_or_other()
 {
   const_TokenPtr t = lexer.peek_token();
-  //printf("skip_after_semicolon_or_other \n");
 
   while(t->get_id() != Tiger::END_OF_FILE &&
          t->get_id() != Tiger::SEMICOLON &&
@@ -266,7 +265,6 @@ Parser::skip_after_semicolon_or_other()
          t->get_id() != Tiger::FUNCTION){
       lexer.skip_token();
       t = lexer.peek_token();
-    //  printf("tkn _or_other %s \n", t->get_token_description());
 
   }
   if(t->get_id() == Tiger::SEMICOLON)
@@ -277,7 +275,6 @@ void
 Parser::skip_before_new_declaration()
 {
   const_TokenPtr t = lexer.peek_token();
-  //printf("skip_before_new_declaration \n");
   while(
     t->get_id() != Tiger::END_OF_FILE &&
     t->get_id() != Tiger::IN &&
@@ -285,13 +282,10 @@ Parser::skip_before_new_declaration()
     t->get_id() != Tiger::FUNCTION && 
     t->get_id() != Tiger::VAR)
     {
-     // printf("tkn new decl %s \n", t->get_token_description());
 
       lexer.skip_token();
       t = lexer.peek_token();
   }
-  //printf("tkn new decl %s \n", t->get_token_description());
-
 
   /*if(t->get_id() != Tiger::END_OF_FILE)
     lexer.skip_token();*/
@@ -357,7 +351,6 @@ Parser::unexpected_token(const_TokenPtr t)
 void
 Parser::parse_program()
 {
-  printf("-----parse_program\n");
 
   // Built type of main "int(int, char**)"
   tree main_fndecl_type_param[] = {integer_type_node,/* int */
@@ -452,17 +445,12 @@ we parameterize the finalization condition. Something like this.
 void
 Parser::parse_statement_seq(bool(Parser::*done)())
 {
-  printf("-----parse_statement_seq\n");
   Tree stmt;
   // Parse statements until done and append to the current stmt list;
   while(!(this->*done)())
     {
-      //Tree stmt = parse_statement();
       const_TokenPtr tok = lexer.peek_token();
-      /*printf("TOKEN parse_statement_seq[1]->  %s \n", tok->get_token_description());
-      if(tok->get_id() == TIGER::IF){ }*/
       stmt = parse_expression();
-      //printf("STMT de parse_statement do tipo %s stmt \n",print_type(stmt.get_type()));
       get_current_stmt_list().append(stmt);
       get_current_stmt_list().set_tipo(stmt.get_type());      
       tok = lexer.peek_token();
@@ -471,7 +459,6 @@ Parser::parse_statement_seq(bool(Parser::*done)())
       }
     }
     stmt_stack.push_back(stmt);
-    //printf("Ultimo current_stmt_list do tipo %s \n ",print_type(get_current_stmt_list().get_tipo()));
 }
 void
 Parser::parse_let_declaration_seq(bool(Parser::*done)())
@@ -567,8 +554,6 @@ Parser::parse_statement(const_TokenPtr t)
 	   |  read_statement
 	   |  print_statement
 	   */
-  printf("-----parse_statement\n");
-  printf("_____tkn(parse)  %s\n", t->get_token_description());
   switch(t->get_id())
     {
    /* case Tiger::VAR:
@@ -631,7 +616,6 @@ Parser::parse_statement(const_TokenPtr t)
 Tree
 Parser::parse_declaration_let()
 {
- printf("-----parse_declaration_let\n");
 
  const_TokenPtr t = lexer.peek_token();
  switch(t->get_id())
@@ -704,7 +688,6 @@ simplicity of this parser at its core.
 Tree
 Parser::parse_expression(int right_binding_power,int assignment_paren)
 {
-  printf("-----parse_expression\n");
 
   const_TokenPtr current_token = lexer.peek_token();
   lexer.skip_token();
@@ -722,7 +705,6 @@ Parser::parse_expression(int right_binding_power,int assignment_paren)
       if(expr.is_error())
 	     return Tree::error();
   }
-  //printf("FIM EXP, TIPO   %s \n ",print_type(expr.get_type()));
 
   return expr;
 }
@@ -757,8 +739,6 @@ Parser::null_denotation(const_TokenPtr tok,int assignment_paren) {
   For literals, the literal itself encodes the value. So the text of the token 
   will have to be interpreted as the appropiate value. For integers we can just use atoi.
   */
-  printf("-----null_denotation\n");
-  printf("_____tkn(null)  %s\n", tok->get_token_description());
   switch(tok->get_id()) {
   case Tiger::IDENTIFIER:{
       SymbolPtr s = query_variable(tok->get_str(), tok->get_locus());
@@ -807,6 +787,7 @@ Parser::null_denotation(const_TokenPtr tok,int assignment_paren) {
       return Tree(build_string_literal(::strlen(c_str) + 1, c_str),tok->get_locus());
     }
     break;
+    /*
   case Tiger::TRUE_LITERAL:
     {
       return Tree(build_int_cst_type(boolean_type_node, 1),tok->get_locus());
@@ -817,19 +798,15 @@ Parser::null_denotation(const_TokenPtr tok,int assignment_paren) {
       return Tree(build_int_cst_type(boolean_type_node, 0),tok->get_locus());
     }
     break;
-    /**/
+    */
   case Tiger::LEFT_PAREN:
     {
-      printf("LEFT PAREN FOUND, %d\n",assignment_paren);
       if(assignment_paren==0){
-        printf("assignment_paren==0\n");
         enter_scope();
         parse_statement_seq(&Parser::done_right_paren);
         Tree last_stmt = stmt_stack.back();stmt_stack.pop_back();
         TreeSymbolMapping tree_scope = leave_scope();
         Tree expr = tree_scope.bind_expr;
-       /* printf("LEFT_PAREN, TIPO   %s \n ",print_type(expr.get_type()));
-        printf("LEFT_PAREN, TIPO   %s \n ",print_type(last_stmt.get_type()));*/
         if(expr.is_error())
             return Tree::error();  
         tok = lexer.peek_token();
@@ -844,7 +821,6 @@ Parser::null_denotation(const_TokenPtr tok,int assignment_paren) {
         return retorno;
 
       }else{
-        printf("assignment_paren==1\n");
         Tree expr = parse_expression();
         tok = lexer.peek_token();
         if (tok->get_id() != Tiger::RIGHT_PAREN)
@@ -964,7 +940,6 @@ later when we talk about blocks.
 */
 Tree
 Parser::parse_variable_declaration(){
- printf("-----parse_variable_declaration\n");
 
   Tree type_tree;
   Tree expr;
@@ -996,7 +971,6 @@ Parser::parse_variable_declaration(){
         return Tree::error();
     }
     first_of_expr = lexer.peek_token();
-    //printf("TOKEN ASSIGN[1]->  %s \n", first_of_expr->get_token_description());
     expr = parse_expression(0,1);
     if(expr.is_error())
       return Tree::error();
@@ -1412,7 +1386,6 @@ Parser::parse_assignment_statement(Tree variable){
   if(first_of_expr->get_id() != Tiger::IF){
     Tree expr = parse_expression(0,1);
     tipo_ultima_exp = get_current_stmt_list().get_tipo();
-    //printf("parse_assignment_statement IF?   %s \n ",print_type(expr.get_type()));
 
     if(expr.is_error())
       return Tree::error();
@@ -1552,11 +1525,6 @@ Parser::parse_if_statement(Tree variable)
     get_current_stmt_list().append(assig_expr);
   }
   
-  printf("IZIIII %s \n ",print_type(last_stmt_then.get_type()));
-  printf("PESADAUM %s \n ",print_type(last_stmt_then.*get_last_stmt().get_type()));
-  printf("Ultimo current_stmt_list DENTRO DO THEN %s \n ",print_type(last_stmt_then.get_type()));
-
-
   TreeSymbolMapping then_tree_scope = leave_scope();
   Tree then_stmt = then_tree_scope.bind_expr;  
 
@@ -1574,20 +1542,21 @@ Parser::parse_if_statement(Tree variable)
         Tree assig_expr = build_tree(MODIFY_EXPR, variable.get_locus(),variable.get_type(), variable, last_stmt_else);
         get_current_stmt_list().append(assig_expr);
       }
-      printf("Ultimo current_stmt_list DENTRO DO ELSE %s \n ",print_type(last_stmt_else.get_type()));
 
       TreeSymbolMapping else_tree_scope = leave_scope();
       else_stmt = else_tree_scope.bind_expr;
       if(last_stmt_then.get_type() != last_stmt_else.get_type()){
-        error_at (tok->get_locus (),"THEN has different type of ELSE, expected %s but found %s",print_type(last_stmt_then.get_type()), print_type(last_stmt_else.get_type()));      
+        printf("THEN has different type of ELSE, expected %s but found %s\n",print_type(last_stmt_then.get_type()), print_type(last_stmt_else.get_type()));
+        /*error_at (tok->get_locus (),"THEN has different type of ELSE, expected %s but found %s",print_type(last_stmt_then.get_type()), print_type(last_stmt_else.get_type()));      
         skip_after_end();
-        return Tree::error ();
+        return Tree::error ();*/
       }
       if(variable!=0){
         if(variable.get_type() != last_stmt_then.get_type()){
-          error_at (tok->get_locus (),"VARIABLE has different type of ELSE, expected %s but found %s",print_type(variable.get_type()), print_type(last_stmt_else.get_type()));      
+          printf("VARIABLE has different type of ELSE, expected %s but found %s",print_type(variable.get_type()), print_type(last_stmt_else.get_type()));
+          /*error_at (tok->get_locus (),"VARIABLE has different type of ELSE, expected %s but found %s",print_type(variable.get_type()), print_type(last_stmt_else.get_type()));      
           skip_after_end();
-          return Tree::error ();
+          return Tree::error ();*/
         }
       }
       skip_token(Tiger::END);
@@ -1655,8 +1624,6 @@ Tree
 Parser::parse_literal_statement(){
   Tree literal = parse_expression();
   
-    printf("-----parse_literal_statement %s \n ",print_type(literal.get_type()));
-
   TreeStmtList stmt_list;
   stmt_list.append(literal);
   return stmt_list.get_tree();
@@ -1665,7 +1632,6 @@ Parser::parse_literal_statement(){
 
 Tree
 Parser::parse_let_statement(){
-  printf("-----parse_let_statement\n");
   /*if(!skip_token(Tiger::LET))
   { 
     skip_after_end();
@@ -1685,7 +1651,8 @@ Parser::parse_let_statement(){
       skip_token(Tiger::IN);
       enter_scope();
       parse_statement_seq(&Parser::done_end);
-      Tree last_stmt = stmt_stack.back();stmt_stack.pop_back();
+      /*Tree last_stmt = */
+      stmt_stack.back();stmt_stack.pop_back();
       /*TreeSymbolMapping in_tree_scope = leave_scope();
       in_stmt = in_tree_scope.bind_expr;
       */
@@ -1729,7 +1696,8 @@ Parser::parse_while_statement()
 
   enter_scope();
   parse_statement_seq(&Parser::done_end);
-  Tree last_stmt = stmt_stack.back();stmt_stack.pop_back();
+  /*Tree last_stmt = */
+  stmt_stack.back();stmt_stack.pop_back();
   TreeSymbolMapping while_body_tree_scope = leave_scope();
 
   Tree while_body_stmt = while_body_tree_scope.bind_expr;
@@ -1821,7 +1789,8 @@ Parser::parse_for_statement()
 
   enter_scope();
   parse_statement_seq(&Parser::done_end);
-  Tree last_stmt = stmt_stack.back();stmt_stack.pop_back();
+  /*Tree last_stmt = */
+  stmt_stack.back();stmt_stack.pop_back();
   TreeSymbolMapping for_body_tree_scope = leave_scope();
   Tree for_body_stmt = for_body_tree_scope.bind_expr;
 
@@ -1948,7 +1917,6 @@ Parser::parse_print_statement()
     return Tree::error();
   }
   if(expr.get_type() == integer_type_node){
-      // printf("%d\n", expr)
       const char *format_integer = "%d\n";
       tree args[]= {build_string_literal(strlen(format_integer) + 1, format_integer), expr.get_tree()};
 
@@ -1958,7 +1926,6 @@ Parser::parse_print_statement()
 
       return stmt;
   }else if(expr.get_type() == float_type_node){
-      // printf("%f\n",(double)expr)
       const char *format_float = "%f\n";
       tree args[] = {build_string_literal(strlen(format_float) + 1, format_float), convert(double_type_node, expr.get_tree())};
 

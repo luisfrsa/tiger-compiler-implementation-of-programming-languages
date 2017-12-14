@@ -12,19 +12,16 @@ in
 		 			do 
 		 				if c<1|c>2 
 			 				then 
-				 				((
+				 				
 			 					print ("C-> {when: (c<1|c>2)}")
 				 				(print(c));
 				 				print("N->");
 				 				print(N);
 				 				(N:=N+1);
 				 				1
-				 				))
+				 				
+				 				end
 
 		 			end
 	end)
 end
-/*
-diferenciar isso: (1+2+3+4)
-disso:
-*/
