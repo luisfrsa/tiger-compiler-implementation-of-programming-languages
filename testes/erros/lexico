@@ -1,0 +1,6 @@
+let
+	ar a:=0
+	var b:0
+in
+	/*nao aprofundei nos erros lexicos*/
+end

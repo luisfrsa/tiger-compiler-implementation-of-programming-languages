@@ -1,0 +1,5 @@
+let
+	print("string")
+in
+	var a:=0
+end

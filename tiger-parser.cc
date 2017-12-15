@@ -801,7 +801,7 @@ Parser::null_denotation(const_TokenPtr tok,int assignment_paren) {
     */
   case Tiger::LEFT_PAREN:
     {
-      if(assignment_paren==0){
+      if(1>2 && assignment_paren==0){
         enter_scope();
         parse_statement_seq(&Parser::done_right_paren);
         Tree last_stmt = stmt_stack.back();stmt_stack.pop_back();
@@ -2395,7 +2395,7 @@ tiger_parse_files(int num_files, const char **files)
 static void
 tiger_parse_file(const char *filename)
 {
-  tiger_parse_file_test_lex(filename);
+  //tiger_parse_file_test_lex(filename);
   // FIXME: handle stdin "-"
   FILE *file = fopen(filename, "r");
   if(file == NULL)
@@ -2410,11 +2410,18 @@ tiger_parse_file(const char *filename)
 
   fclose(file);
 }
+
+
+
+
+
+
+
+
 static void 
 tiger_parse_file_test_lex(const char *filename)
 {
- // FIXME: handle stdin "-"
-  FILE *file = fopen(filename, "r");
+/*  FILE *file = fopen(filename, "r");
   if(file == NULL)
     {
       fatal_error(UNKNOWN_LOCATION, "cannot open filename %s: %m", filename);
@@ -2443,5 +2450,5 @@ tiger_parse_file_test_lex(const char *filename)
     }
 
 
-  fclose(file);
+  fclose(file);*/
 }

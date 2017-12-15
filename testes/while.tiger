@@ -1,0 +1,10 @@
+let
+	var i:=0
+in
+	while i < 10 do
+		print("Valor de i while");
+		print(i);
+		i := i+1;
+		
+	end
+end

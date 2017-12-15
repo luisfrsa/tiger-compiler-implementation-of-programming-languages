@@ -1,2 +1,0 @@
-/* correct if */
-if 10 < 20 then print("condicao if e vdd") else print("condicao if e falsa")	

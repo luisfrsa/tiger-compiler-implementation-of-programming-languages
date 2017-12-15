@@ -1,0 +1,13 @@
+let
+	var a:=0
+
+	var 1a:=0
+	var a1.1:=0
+
+	var b:int:=0.5
+	var c:int:="string"
+	var a:=0
+
+in
+0
+end

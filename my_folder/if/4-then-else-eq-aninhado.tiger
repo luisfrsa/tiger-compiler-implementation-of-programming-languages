@@ -1,6 +1,0 @@
-/* OK */
-
-if 5>4 then 13 
-else if 6>4 
-then 13 
-else 13

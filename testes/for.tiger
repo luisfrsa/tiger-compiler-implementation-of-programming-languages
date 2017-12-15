@@ -1,0 +1,9 @@
+let
+	var i:=0
+in
+	(for i := (1+2) to (4+5) do
+		print("Valor de i for");
+		print (i);
+		
+	end)
+end
